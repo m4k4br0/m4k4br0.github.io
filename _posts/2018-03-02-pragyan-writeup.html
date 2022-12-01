@@ -1,0 +1,20 @@
+---
+title: "PRAGYAN CTF – El33t Articles Hub (Web 200pts)"
+layout: post
+date: 2018-03-02
+categories: writeups
+---
+
+<code>"Are you a person interested in reading articles on hacking? You’ve come to the right place, check out our brand new website for article-reading enthusiasts."</code>
+<br>
+<br>
+Essa challenge combinou dois tipos de vulnerabilidades, Path Traversal e LFI.
+<br>
+<br>
+Olhando o source code da index consegui ver que existia um <code>favicon.php?id=2</code>, logo abaixo tinhamos um <code>index.php?file=</code>, que buscava arquivos em certo diretorio, fazendo alguns testes, conseguimos ver que o arquivo precisa ser <code>.txt</code>. Achei um Path traversal no <code>favicon.php</code> e baixei os códigos, em um deles, <code>helpers.php</code>, havia um diretório que basicamente especificava o local. 
+<br>
+<br>
+Fiz o bypass em cima do filtro para lfi e inclui o arquivo da flag pelo <code>?file</code>.
+<br>
+<script src="https://asciinema.org/a/qK5i7m44nGHgtwP3U8YNDlJE4.js" id="asciicast-qK5i7m44nGHgtwP3U8YNDlJE4" async></script>
+

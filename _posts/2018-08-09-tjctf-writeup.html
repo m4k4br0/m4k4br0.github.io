@@ -1,0 +1,20 @@
+---
+title: "TJCTF Ess Kyoo Ell - Writeup"
+layout: post
+date: 2018-08-09
+category: writeups
+---
+
+<p>Está challenge é interessante, as vezes não parece muito realista, mas se levar pelo lado de que cada vez os desenvolvedores tentam deixar tudo mais automatico, ela se encaixa perfeitamente nesse quesito!</p>
+<img src="https://i.imgur.com/ByOv3s8.png">
+<p>No inicio parecia muito um sql injection para bypass de auth, tentei alguns injections simples, como <code>' or 1=1#</code> e derivados</p>
+<img src="https://i.imgur.com/RtVTVug.png">
+<p>Mas olhando mais atentamente, ele está tentando pegar algo de uma coluna 'password' que nem sequer parece existir, se isso estivesse bugado, eles provavelmente ja teriam corrigido, mas na verdade, o que acontece é que os parametros do post são as colunas!</p>
+<img src="https://i.imgur.com/zztxytX.png">
+<p>Fazendo um teste simples, podemos confirmar isso:</p>
+<img src="https://i.imgur.com/vdXCOZV.png">
+<p>Para não confundir o parametro com o seu valor, e deixar o injection na key do parametro, eu usei o encode do '=', para não ocorrer está confusão internamente:</p>
+<img src="https://i.imgur.com/K4tif3T.png">
+<p>Bem, ficou claro que conseguimos fazer o dump de um usuario, mas, a descrição nos diz que precisamos do ip do adminstrador, então, o que fiz foi tentar procurar pelo user admin pelo injection...</p>
+<img src="https://i.imgur.com/vAqpvFW.png">
+<p>Então, a flag fica tjctf{145.3.1.213}</p>

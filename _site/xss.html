@@ -1,0 +1,14 @@
+<html>
+  <head>
+    <script>
+    var data = location.hash.substr(1);
+    var msg = document.getElementById("msg");
+    msg.innerText=atob(data);
+    </script>
+  </head>
+<body>
+  <h3>your data:</h3>
+  <div id="msg">
+  </div>
+</body>
+</html>

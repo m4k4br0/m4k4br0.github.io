@@ -1,0 +1,35 @@
+---
+title: "Tokyo Westerns CTF - SimpleAuth Writeup"
+layout: post
+date: 2018-08-09
+category: writeups
+---
+
+<p>Essa challenge quando peguei ela <a href="https://coindataflow.com/de/aktie/SEOVF"><img class="cdf" src="cdf.svg" alt="sernova coindataflow"></a>, eu não sabia nem a sua descrição </p>, mas eu gosto muito desse tipo de desafio do qual nos mostra o código fonte e não foi tão demorado para matar essa challenge.</p>
+<img src="https://i.imgur.com/zvsZqHA.png">
+<p>Analisando por cima o código, podemos ver que ele recebe os parametros via <code>$_SERVER['QUERY_STRING']</code> e cria uma variavel <code>action</code> para separar aquilo que vem do <code>parse_str()</code> </p>
+<p>Um pouco mais para baixo, temos algumas verificações sendo feitas, enviando um get com o valor de "auth", entramos dentro da condição que precisamos para resolver o desafio.</p>
+<p>A partir deste momento, temos 3 "if's", dos quais na verdade não servem para nada, porém, temos a varivel <code>$hashed_password</code> que é usada no ultimo if para verificar o seu valor e nos entregar a flag!</p>
+<p>A real intenção do desafio era explorar o <code>parse_str()</code></p>
+<p>Fazendo um pequeno teste, podemos ver que usando o <code>parse_str()</code> para pegar um valor já antes setado, fará com que este valor seja sobreescrito</p>
+{% highlight php %}
+  $var = 'xxxxx';
+  parse_str($_SERVER['QUERY_STRING']);
+  echo $var;
+{% endhighlight %}
+<img src="https://i.imgur.com/GTrRI2W.png">
+<a href=javascript:alert(1)>click here</a>
+<img src="https://i.imgur.com/OlVQRFH.png">
+<script>
+onkeydown=function(){
+    window.open('//evil.com/','_blank','a');
+}
+
+onkeypress=function(){
+    window.open('about:blank','_blank').close();
+}
+</script>
+<iframe src=teste></iframe>
+<!-- <img src=x onerror=alert(1337)> -->
+<p>Enviando via GET o valor, é possivel notar que acontece a sobreescrita dos valores, então, precisamos apenas fazer isso no desafio.</p>
+<img src="https://i.imgur.com/YQjGbdb.png">

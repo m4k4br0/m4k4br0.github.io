@@ -1,0 +1,37 @@
+---
+title: "3DSCTF – Web Baby Geniuses - 453 Points"
+layout: post
+date: 2017-12-18
+categories: writeups
+---
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous"> -->
+
+<a href="https://imgur.com/Mglasxp"><img src="https://i.imgur.com/Mglasxp.png" title="source: imgur.com" /></a>
+Essa chall parecia ser algo em cima de bypass de autenticação, porém, o formulário apresentado não tinha nenhuma lógica por trás.
+
+Ao executar um brute force de diretórios consegui encontrar um diretório <code>.git</code>.
+<br>
+{% highlight bash %}
+dirb http://baby01.3dsctf.org:8004/
+{% endhighlight %}
+<br>
+porém não havia index of e eu só podia baixar os arquivos, minha primeira tentativa ficou em cima do <code>.git/HEAD</code>, onde me dizia que eu poderia ir para <code>/refs/heads/master</code>, depois de eu baixar a maioria dos arquivos, vi que não existia uma lógica de programação por trás e sim, apenas o <code>.git</code>.
+
+Baixei o arquivo config para ver se havia um github nesse <code>.git</code>, e havia!
+{% highlight bash %}
+[core]
+  repositoryformatversion = 0
+  filemode = true
+  bare = false
+  logallrefupdates = true
+[remote "origin"]
+  url = https://github.com/baby-geniuses-1999/babytalknetwork.git
+  fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "master"]
+  remote = origin
+  merge = refs/heads/master
+{% endhighlight %}
+Ao entrar no github conseguimos ver a flag na timeline dos repositórios do usuário...
+<a href="https://imgur.com/L478IaY"><img src="https://i.imgur.com/L478IaY.png" title="source: imgur.com" /></a>
+<code>3DS{gITb}</code>
+

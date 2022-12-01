@@ -1,0 +1,13 @@
+<html>
+  <head>
+  </head>
+<body>
+<script>
+window.onload=function(){
+        var ifr = document.createElement('iframe');
+        ifr.src = location.hash.substr(1);
+        document.body.appendChild(ifr);
+}
+</script>
+</body>
+</html>

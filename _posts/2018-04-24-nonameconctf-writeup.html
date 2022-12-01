@@ -1,0 +1,28 @@
+---
+title: "NoNameConCTF - Convert Writeup"
+layout: post
+date: 2018-04-24
+categories: writeups
+---
+
+<pre>
+  Convert 100
+
+  If you need to convert something to Markdown, you can try our service: http://convert.nonameconctf2018.xyz
+</pre>
+
+<p>Este desafio ilustra um simples SSRF!</p>
+<br>
+<p>Uma das primeiras coisas que tentei foi enviar <code>http://127.0.0.1</code>, mas sem sucesso.</p>
+<br>
+<img src="https://i.imgur.com/839eg3Y.png">
+<br>
+<p>Então eu decidi tentar com <code>0.0.0.0</code>.</p>
+<br>
+<img src="https://i.imgur.com/kc81Z6l.png">
+<br>
+<p>E funcionou, porém eu não sabia o que procurar, então, fiz o simples, usei o dirb para procurar algum arquivo no webroot:</p>
+<img src="https://i.imgur.com/uCThGlR.jpg">
+<br>
+<p>Temos um arquivo que nao temos permissão para acesso, porém, como temos o ssrf, podemos bypassar isso...</p>
+<img src="https://i.imgur.com/CtqseLe.png">

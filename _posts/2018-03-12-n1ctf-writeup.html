@@ -1,0 +1,125 @@
+---
+title: "N1CTF - funning eating cms Writeup"
+layout: post
+date: 2018-03-12
+categories: writeups
+---
+
+
+<code>"a strange online reservation system for restaurants,please hacking it"</code>
+<br>
+Ao entrar ir para o link, ele nos entregava a seguinte pagina:
+<br>
+<img src="https://i.imgur.com/XCMO2qh.png">
+<br>
+<p>fazendo o login somos redirecionados para outra pagina:</p>
+<br>
+<img src="https://i.imgur.com/lXXKimC.png">
+<br>
+<img src="https://i.imgur.com/FEFs8q9.png">
+<br>
+<br>
+<p>Aqui conseguimos ver aquilo que seria a primeira vulnerabilidade encontrada, um LFI no <code>user.php?page=</code>.</p>
+<br>
+<img src="https://i.imgur.com/m6SrN0q.png">
+<br>
+<img src="https://i.imgur.com/SBHhxc0.png">
+<br>
+<br>
+<p>Ok, o arquivo <code>guest</code> não nos deu muitas informações, então, fui atrás de outros arquivos:</p>
+<br>
+<img src="https://i.imgur.com/AtcxXwD.png">
+<br>
+
+<img src="https://i.imgur.com/K0R7TtO.png">
+
+<br>
+<br>
+<p>Agora sim, a partir desse código, ja conseguimos ir para outros arquivos que não estavam a nossa vista...</p>
+<br>
+<img src="https://i.imgur.com/XcbGkIg.png">
+<br>
+<br>
+<img src="https://i.imgur.com/21fassV.png">
+<p>Neste arquivo <code>function.php</code>, é bom destacar algumas coisas que estão sendo feitas:</p>
+<p>temos dois tipos de filtros bloqueando algumas palavras, como <code>manage</code>, <code>flag</code> e <code>ffffllllaaaaggg</code>, logo não conseguimos acessar esses arquivos pelo lfi casual.</p>
+
+<p>Fazendo pequenos testes para ver se conseguimos algo, tivemos uma boa resposta no arquivo <code>info</code>:</p>
+<br>
+<img src="https://i.imgur.com/DAHUeaQ.png">
+<br>
+<br>
+<p>Achamos um hint do qual ja sabemos que existe...</p>
+<br>
+<br>
+<p>Bem, já conseguimos tudo aquilo que queriamos, agora, precisamos avançar na procura e achar um bypass para acessar arquivos que foram bloqueados em um primeiro momento.</p>
+<p>O filtro da url está sendo feito com o auxilio da função <code>parse_url</code> e <code>parse_str</code>, porém, esta função tem uma fraqueza, quando adicionamos barras a mais("/") na url, conseguimos fazer com que a função não faça o parsing correto e, portanto, não lê a url inteira:
+<br>
+<img src="https://i.imgur.com/NZFyBzf.png">
+<br>
+<img src="https://i.imgur.com/AcwSf98.png">
+<br>
+<br>
+<p>Encotramos mais um arquivo que não estava em nossa vista, buscando ele no lfi e vendo seu conteudo, vemos que ele está fazendo o <code>include</code> de um template. Logo, isso quer dizer que o arquivo é algo manipulavel pelo usuario...</p>
+<br>
+<br>
+<p>Entrando na página, temos um formulário para enviar arquivos.</p>
+<br>
+<img src="https://i.imgur.com/lfox2Mj.png">
+<br>
+<br>
+<p>Verificando o código que já haviamos obtido, não vi nenhuma entrada para arquivos, então, abri a source e encontrei o arquivo <code>upllloadddd.php</code>.</p>
+<br>
+<img src="https://i.imgur.com/lE8pfyq.png">
+<br>
+<img src="https://i.imgur.com/RlHkPa1.png">
+<br>
+<br>
+<p>Fazendo uma pequena análise em cima do código, conseguiamos destacar duas coisas para o bypass:</p>
+<br>
+<code>1.</code>
+<img src="https://i.imgur.com/tiQXrDS.png">
+<br>
+<p>Ele está usando a função <code>system</code> com uma concatenação sem filtros, isso nós da a possibilidade de uma RCE.</p>
+<br>
+<code>2.</code>
+<img src="https://i.imgur.com/T8jFoAS.png">
+<br>
+<p>Ele está verificando a extensão do nosso arquivo, logo, precisamos de uma forma de enviar uma extensão.</p>
+<br>
+<p>A forma mais fácil que eu pensei bypassar, foi usando um comentario <code>#</code> e passando a extensão logo em seguida:</p>
+<br>
+<img src="https://i.imgur.com/HEbjEFh.png">
+<br>
+<br>
+<p>Após algumas tentativas procurando em todos esses arquivos listados, pensei que talvez a flag estivesse no banco de dados, então, fui atrás do conteúdo do arquivo <code>config.php</code>.</p>
+<br>
+<img src="https://i.imgur.com/FUEuFx0.png">
+<br>
+<br>
+<p>Usei as credenciais do <code>mysql</code> do arquivo <code>config.php</code> para logar no <code>mysql</code> e dumpar o conteúdo do banco de dados...</p>
+<br>
+<img src="https://i.imgur.com/VkrNWR2.png">
+<br>
+<img src="https://i.imgur.com/iamu3VI.png">
+<br>
+<img src="https://i.imgur.com/Cle27NS.png">
+<br>
+<br>
+<p>Encontrei muitos users e nada de flag, então, pensei no óbvio, procurar a flag no sistema.</p>
+<br>
+<img src="https://i.imgur.com/0d5gqMe.png">
+<br>
+<p>encontramos o arquivo da flag (flag_233333)<code>:)</code>.</p>
+<br>
+<br>
+<img src="https://i.imgur.com/SDNbsVQ.png">
+<br>
+<br>
+<p>Então, me deparei que não podiamos usar "/"... :P</p>
+<p>Mas não importa, podemos usar o cd...</p>
+<br>
+<img src="https://i.imgur.com/kMJE9yo.png">
+<br>
+
+

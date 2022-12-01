@@ -1,0 +1,57 @@
+---
+title: "CVE-2018-5715 sugarCRM XSS"
+layout: post
+date: 2018-01-16
+category: cve
+---
+
+A SugarCRM permite que as empresas criem relacionamentos de proximidade com clientes, com a solução mais adaptável e econômica do mercado para gestão de relacionamento com o cliente (CRM, na sigla em inglês).
+<br>
+<br>
+XSS SugarCRM 3.5.1:
+<br>
+Quando paramos para analisar o seguinte trecho de código, conseguimos ver que a primeira key é o "print".
+
+{% highlight php %}
+phprint.php
+ 32 foreach ($_GET as $key => $val) {
+ 33   if ($key != "print") {
+ 34     if (is_array($val)) {
+ 35       foreach ($val as $k => $v) {
+ 36         $query_string .= "{$key}[{$k}]=" . urlencode($v) . "&";
+ 37       }
+ 38     }
+ 39     else {
+ 40       $query_string .= "{$key}=" . urlencode($val) . "&";
+ 41     }
+ 42   }
+ 43 }
+ 44 
+ 45 $url = "{$_SERVER['PHP_SELF']}?{$query_string}";
+{% endhighlight %}
+
+<code>"{$key}=" . urlencode($val) . "&";</code>, ok , o valor da key está sendo encodado, e no print que temos:
+{% highlight php %}
+ 60 <a href="<?php echo $url; ?>"><?php echo $app_strings['LBL_BACK']; ?></a><br><br>
+{% endhighlight %}
+
+a url está sendo jogada inteiramente, então, só nos resta ir no único lugar que não foi encodado, que é na key em si:
+<br>
+<code>print=a&"/><xss>alert(1)</xss></code>
+<br>
+A index do sugarCRM 3.5.1 faz um include do phprint.php, então, esse xss pode ser aplicado em dois lugares, na index.php ou em phprint.php.
+
+{% highlight php %}
+681 if (isset($_GET['print'])) {
+682   $page_str = ob_get_clean();
+683   $page_arr = explode("<!-- crmprint -->", $page_str);
+684   include("phprint.php");
+685 }
+{% endhighlight %}
+
+
+{% highlight javascript %} url example 1 = http://vulnerable/phprint.php?print=a&"/><xss>alert(1)</xss>{% endhighlight %}
+{% highlight javascript %} url example 2 = http://vulnerable/index.php?action=Login&module=Users&print=a&"/><xss>alert(1)</xss>{% endhighlight %}
+
+
+

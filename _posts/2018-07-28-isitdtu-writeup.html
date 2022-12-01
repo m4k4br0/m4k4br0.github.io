@@ -1,0 +1,151 @@
+---
+title: "ISITDTU CTF Friss - Writeup"
+layout: post
+date: 2018-07-28
+category: writeup
+
+---
+<p>Está challenge aconteceu este final de semana e eu gostei muito da resolução dela, e também consegui um first blood aqui :) </p>
+<img src="https://i.imgur.com/xpiQ4x4.png">
+<br>
+<img src="https://i.imgur.com/BKL98LX.png">
+
+<p>Bem, entrando na challenge não tínhamos muita coisa para fazer, haviamos um input e um botão, basicamente indicando que tínhamos um curl sendo executado, a primeira coisa que tentei, foi tentar enviar algo para o google.com e ver se retornava algum valor:</p>
+<img src="https://i.imgur.com/x44sNn7.png">
+<img src="https://i.imgur.com/6qpAlUX.png">
+<p>Bem, parece que só podemos enviar coisas para o localhost, então, indo um pouco a fundo, podemos achar um pequeno bypass para isso, já que a aplicação não está barrando wrappers, temos a possibilidade de utilizar o file:// aqui:</p>
+{% highlight php %}
+php > var_dump(parse_url('file://localhost/../var/www/html/index.php"'));
+array(3) {
+  ["scheme"]=>
+  string(4) "file"
+  ["host"]=>
+  string(9) "localhost"
+  ["path"]=>
+  string(27) "/../var/www/html/index.php""
+}
+{% endhighlight %}
+<br>
+<img src="https://i.imgur.com/knlEmbs.png">
+<br>
+<img src="https://i.imgur.com/K6IYvF2.png">
+<br>
+Ok, conseguimos o código da index, vamos dar uma olhada nele:
+{% highlight php %}
+include_once "config.php";
+if (isset($_POST['url'])&&!empty($_POST['url']))
+{
+	$url = $_POST['url'];
+	$content_url = getUrlContent($url);
+}
+else
+{
+	$content_url = "";
+}
+if(isset($_GET['debug']))
+{
+	show_source(__FILE__);
+}
+{% endhighlight %}
+<br>
+<p>Aqui não tem muito o que analisar, pois a função getUrlContent() está vindo muito provavelmente do config.php:</p>
+<br>
+<img src="https://i.imgur.com/btOBq77.png">
+<p>Aqui sim, temos o que analisar:</p>
+{% highlight php %}
+<?php
+$hosts = "localhost";
+$dbusername = "ssrf_user";
+$dbpasswd = "";
+$dbname = "ssrf";
+$dbport = 3306;
+
+$conn = mysqli_connect($hosts,$dbusername,$dbpasswd,$dbname,$dbport);
+
+function initdb($conn)
+{
+	$dbinit = "create table if not exists flag(secret varchar(100));";
+	if(mysqli_query($conn,$dbinit)) return 1;
+	else return 0;
+}
+
+function safe($url)
+{
+	$tmpurl = parse_url($url, PHP_URL_HOST);
+	if($tmpurl != "localhost" and $tmpurl != "127.0.0.1")
+	{
+		var_dump($tmpurl);
+		die("<h1>Only access to localhost</h1>");
+	}
+	return $url;
+}
+
+function getUrlContent($url){
+	$url = safe($url);
+	$url = escapeshellarg($url);
+	$pl = "curl ".$url;
+	echo $pl;
+	$content = shell_exec($pl);
+	return $content;
+}
+initdb($conn);
+?>
+{% endhighlight %}
+<p>É sempre interessante quando temos usuarios,senhas e etc presentes no código, vamos guardar, pois pode nos ser utíl futuramente.</p>
+<p>Analisando o initdb() você consegue ver que a função está criando uma tabela chamada flag com uma coluna secret no banco de dados, caso ela ainda não exista...</p>
+
+<br>
+<p>A função safe() está pegando a url passada e verificando via parse_url() se o host bate com localhost ou 127.0.0.1, nenhuma verificação pesada aqui...</p>
+<p>Bem, aqui no getUrlContent() eu confesso que cheguei a pensar que havia, talvez, uma nova de bypassar o escapeshellarg e conseguir injetar comandos, porém, não faria sentido algum isso, mas eu pensei nessa possibilidade e perdi muito tempo com isso…</p>
+<p>Olhando para a função, conseguimos ver que ela está usando o escapeshellarg para criar um escape nos argumentos do comando, logo abaixo é executado um shell_exec e retornado para o usuário.</p>
+
+<p>Ok, pensando nas possibilidades, ficou muito claro que eu deveria persistir no ssrf, e talvez encontrar algum protocolo disponível do qual eu conseguisse me aproveitar para conseguir uma shell talvez, então tentei ftp://,ssh://,dict:// e então gopher://…</p>
+
+<img src="https://i.imgur.com/tSg37dR.png">
+<p>Eu já havia estudado diversas vezes em formas de conseguir shell com o gopher, usando redis ou fastcgi em conjunto, mas nunca havia feito com mysql, encontrei alguns artigos que me indicaram que uma parte do formato do pacote do mysql, quando enviado na pilha tcp, seria o formato que o mysql entenderia caso pudessemos envia-lo por uma url, bem, é muito abstrato falar assim, vamos ver como isso funciona na prática, porém, antes, vamos criar um usuário igual ao do desafio “ssrf_user” em nosso mysql…</p>
+
+<pre>
+mysql> CREATE USER 'ssrf_user'@'localhost';
+Query OK, 0 rows affected (0,07 sec)
+
+mysql> GRANT USAGE ON *.* TO 'ssrf_user'@'localhost';
+Query OK, 0 rows affected (0,01 sec)
+
+mysql> GRANT ALL PRIVILEGES *.* TO 'ssrf_user'@'localhost';
+Query OK, 0 rows affected (0,10 sec)
+</pre>
+<br>
+<p>Ok, agora podemos prosseguir melhor.</p>
+<p>Vamos abrir o wireshark para ver como o protocolo vai se comportar quando enviarmos um pacote de conexão e login para o mysql:</p>
+<img src="https://i.imgur.com/e2pjxmm.png">
+<p>Eu cheguei a fazer o login pelo mac, mas percebi que o mysql do mac estava gerando de uma forma totalmente diferente da original o pacote de conexão, ele estava grande demais para apenas um login, então, abri um ubuntu com mysql e um wireshark para testar isso, mas basicamente o que precisamos selecionar é o último segmento apresentado do pacote pelo wireshark, que é só a parte do pacote que a gente faz a tentativa de login:</p>
+<img src="https://i.imgur.com/d2lTn7s.png">
+<br>
+<p>A gente basicamente pode dividir essa comunicação do pacote do mysql e duas partes, a parte da conexão e a parte da execução dos comandos, aqui estamos apenas na parte da conexão.</p>
+<img src="https://i.imgur.com/zMvBS7c.png">
+
+<p>A partir daqui, precisamos fazer isso virar uma url, e a forma mais fácil de fazer isso, é usar o input do “Show and save data as” e setar ele para “Raw”:</p>
+<img src="https://i.imgur.com/bV97KbV.png">
+<p>Ok, agora, precisamos encodar isso tudo em um formato adequado para a url, na verdade não é muito difícil, bastaria adicionar % a cada dois bytes, mas eu encontrei um script que faz isso para nós:</p>
+{% highlight python %}
+def result(s):
+  a = [s[i:i+2] for i in xrange(0, len(s), 2)]
+  return "curl gopher://127.0.0.1:3306/_%" + "%".join(a)
+
+if __name__ == "__main__":
+  import sys
+  s = sys.argv[1]
+  print result(s)
+{% endhighlight %}
+<br>
+<img src="https://i.imgur.com/Gie5b2C.png">
+<img src="https://i.imgur.com/mJxrJjh.png">
+<p>Parece que funcionou, bem, mas como já haviamos visto antes, é criado um banco de dados com uma tabela flag com uma coluna secret, então, vamos dumpar ela com o gopher…</p>
+<br>
+<p>Vamos mudar o nosso comando de login agora, para mysql -h 127.0.0.1 -u ssrf_user -e “use ssrf; select secret from flag"</p>
+<img src="https://i.imgur.com/CTDdkpI.png">
+<p>Olhando neste novo pacote, a gente consegue até ver a query que será executada…</p>
+<br>
+<p>depois de refazer o processo inteiro em cima deste novo pacote, conseguimos enfim a flag!</p>
+<img src="https://i.imgur.com/lxvxX7Y.png">
+<img src="https://i.imgur.com/jA991Ma.png">

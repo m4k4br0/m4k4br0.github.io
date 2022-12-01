@@ -1,0 +1,31 @@
+---
+title: "Byte Bandits CTF - R3M3MB3R Writeup"
+layout: post
+date: 2018-04-08
+categories: writeups
+---
+
+Essa challenge nós dava a seguinte página:
+<br>
+<img src="https://i.imgur.com/qgWzjcj.png">
+<br>
+Sem pensar muito, podemos ver que se trata de um lfi, então, fiz o simples:
+<br>
+<img src="https://i.imgur.com/CPW5SnH.png">
+<br>
+<img src="https://i.imgur.com/FcA2IOS.png">
+<br>
+O código de <code>eg.php</code> não nos diz nada, resolvi tentar a <code>index.php</code> e me deparei com um filtro.
+<br>
+Depois de algumas tentativas para tentar conseguir o código do arquivo <code>index.php</code>, resolvi ir a procura de outras formas, como por exemplo, os logs do apache.
+<br>
+<img src="https://i.imgur.com/y9rKFVc.png">
+<br>
+Algumas horas se passaram e a minha infecção de log não estava funcionando, pois o log estava fazendo o urlencode da url, então, foi que surgiu a ideia via "Alisson Bezerra", de tentar fazer o infect pelo <code>User-Agent</code>.
+<br>
+E funcionou...
+<br>
+<img src="https://i.imgur.com/MI86zkV.png">
+<br>
+<img src="https://i.imgur.com/2MzSXxk.png">
+

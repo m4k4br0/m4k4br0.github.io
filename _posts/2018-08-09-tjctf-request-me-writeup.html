@@ -1,0 +1,15 @@
+---
+title: "TJCTF Request Me - Writeup"
+layout: post
+date: 2018-08-09
+category: writeup
+---
+<p>Este desafio na verdade ele é bem bobo, mas o que é chato, é que ele estava bloquenado o uso do burp suite e do mitmproxy, mas usando o postman é possivel fazer as requests!</p>
+<p>Inicialmente, tentei fazer tudo direto pelo curl, mas não funcionou, não sei exatamente o porque, mas executei exatamente as mesmas coisas do curl no postman e funcionou</p>
+<img src="https://i.imgur.com/5NYBuc0.png">
+
+<p>Nas primeiras requests a challenge nos induzia a enviar o OPTIONS para ver os métodos aceitos:</p>
+<img src="https://i.imgur.com/KjTElM6.png">
+<p>Dentro do OPTIONS ele nos dizia que haviamos 2 parametros para serem enviados, porém, não se sabia onde, então eu tentei enviar os parametros tanto em GET, como em POST também.</p>
+<p>Notei que nenhum funcionou, então, testei os dois juntos em outros métodos, até conseguir com o método DELETE:</p>
+<img src="https://i.imgur.com/QmixNfh.png">

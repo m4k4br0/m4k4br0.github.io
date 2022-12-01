@@ -1,0 +1,25 @@
+---
+title: "SunshineCtf - Home Sweet Home"
+layout: post
+date: 2018-04-08
+categories: writeups
+---
+<code>"Home Sweet Home
+<br>
+Looks like this site is doing some IP filtering.
+That's very FORWARD thinking of them.
+<br>
+Have fun!
+<br>
+http://web1.sunshinectf.org:50005"</code>
+<br>
+Essa challenge nos entregava a seguinte página:
+<br>
+<img src="https://i.imgur.com/0IGcZ3V.png">
+<br>
+Pelo titulo e pelo ip sendo mostrado na página, logo imaginei que ele estava se referindo ao ip <code>127.0.0.1</code>.
+Resolvi mandar o ip <code>127.0.0.1</code> via o header <code>X-Forwarded-For</code>...
+<br>
+<img src="https://i.imgur.com/az4Tp04.png">
+
+E deu certo :).
